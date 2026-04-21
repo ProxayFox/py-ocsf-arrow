@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "nix": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "schedule": ["every weekend"],
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency Dashboard 🤖",
+  "assignees": ["proxay"],
+  "dependencyDashboardLabels": ["renovate"],
+  "packageRules": [
+    {
+      "description": "Wait for approval before opening Major update PRs",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchManagers": ["devcontainer"],
+      "groupName": "DevContainer Updates"
+    },  
+    {
+      "matchManagers": ["dockerfile"],
+      "groupName": "DevContainer Updates"
+    },
+    {
+      "matchManagers": ["nix"],
+      "groupName": "Nix Updates"
+    },
+    {
+      "matchManagers": ["pep621"],
+      "groupName": "Python (uv) Updates"
+    }
+  ]
+}

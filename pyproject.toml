@@ -1,0 +1,42 @@
+[project]
+name = "py-ocsf-arrow"
+version = "0.1.0"
+description = "A Python library for working with OCSF data in Apache Arrow format."
+readme = "README.md"
+requires-python = ">=3.14"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
+]
+dependencies = [
+    "arrow>=1.4.0",
+    "ocsf-lib>=0.10.4",
+]
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
+    "pymdown-extensions>=10.21.2",
+]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4",
+    "checkov>=3.1.47",
+    "deptry>=0.25.1",
+    "pre-commit>=4.5.1",
+    "psutil>=7.2.2",
+    "pyarrow-stubs>=20.0.0.20251215",
+    "pyinstrument>=5.1.2",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.15.11",
+    "scalene>=2.2.1",
+    "scalene-mcp>=0.1.0",
+    "ty>=0.0.32",
+    "types-defusedxml>=0.7.0.20260408",
+    "types-pyyaml>=6.0.12.20260408",
+    "vulture>=2.16",
+]
