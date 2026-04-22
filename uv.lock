@@ -1392,15 +1392,11 @@ wheels = [
 [[package]]
 name = "ocsf-lib"
 version = "0.10.4"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/ProxayFox/ocsf-lib-py.git?rev=c9e302b662fac8c7a8958efdba5bffdcb19f4eff#c9e302b662fac8c7a8958efdba5bffdcb19f4eff" }
 dependencies = [
     { name = "dacite" },
     { name = "semver" },
     { name = "termcolor" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c1/7f/a3772f60f051f7aad27f18737bfbc1a3fc0cc3fcb7d7d3429fbe12474003/ocsf_lib-0.10.4.tar.gz", hash = "sha256:f80efa3836574da37353f787f71d31a524afd3a26d58f35cc4a253bcb6c24f33", size = 55440, upload-time = "2025-07-07T18:56:08.805Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4a/9a/3f56656585541d2d22107e11cf0edfc974a2cd2758bf39e4b809821b9e86/ocsf_lib-0.10.4-py3-none-any.whl", hash = "sha256:251c0b35a7e4482a8b92678784a0b883992473a8e514c48cdd41f700d6d4caa0", size = 77134, upload-time = "2025-07-07T18:56:07.595Z" },
 ]
 
 [[package]]
@@ -1715,7 +1711,7 @@ dev = [
 requires-dist = [
     { name = "mkdocs", marker = "extra == 'docs'", specifier = ">=1.6.1" },
     { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9.7.6" },
-    { name = "ocsf-lib", specifier = ">=0.10.4" },
+    { name = "ocsf-lib", git = "https://github.com/ProxayFox/ocsf-lib-py.git?rev=c9e302b662fac8c7a8958efdba5bffdcb19f4eff" },
     { name = "pyarrow", specifier = ">=23.0.1" },
     { name = "pymdown-extensions", marker = "extra == 'docs'", specifier = ">=10.21.2" },
 ]
