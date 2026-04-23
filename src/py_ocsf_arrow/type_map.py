@@ -1,7 +1,5 @@
 import pyarrow as pa
 import json
-from dataclasses import dataclass
-from typing import Any, Optional
 from functools import cached_property
 from typing import TypeAlias, cast
 from http.client import HTTPResponse
@@ -15,6 +13,7 @@ from . import OCSFArrow
 
 class TypeMappingError(Exception):
     """Custom exception for type mapping errors."""
+
     pass
 
 
@@ -31,7 +30,7 @@ class TypeMapper(OCSFArrow):
         "integer_t": pa.int32(),
         "json_t": pa.string(),
         "long_t": pa.int64(),
-        "string_t": pa.string()
+        "string_t": pa.string(),
     }
 
     @cached_property

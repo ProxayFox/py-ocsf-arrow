@@ -1,27 +1,48 @@
+import json
+from pathlib import Path
 from ocsf.api.client import OcsfApiClient
+from ocsf.util import get_schema
+from dataclasses import asdict
+from typing import Any
 
-from py_ocsf_arrow.schema_gen import build_arrow_schema
+CACHE_DIR = Path(".cache")
+if not CACHE_DIR.exists():
+    CACHE_DIR.mkdir(parents=True)
 
-# Load OCSF schema v1.8.0 (from API, file, or repo)
-client = OcsfApiClient()
+OUTPUT_DIR = Path("outputs")
+if not OUTPUT_DIR.exists():
+    OUTPUT_DIR.mkdir(parents=True)
 
-ocsf_old_schema = client.get_schema("1.7.0")
-print("OCSF schema loaded successfully" if ocsf_old_schema is not None else "Failed to load OCSF schema")
+CLIENT = OcsfApiClient(cache_dir=CACHE_DIR)
 
 
-ocsf_version = client.get_default_version()
-ocsf_schema = client.get_schema(ocsf_version)
+def ocsf_types(ocsf_version: str) -> list[dict[str, Any]]:
+    ocsf_schema = get_schema(ocsf_version, CLIENT)
 
-print("OCSF schema loaded successfully" if ocsf_schema is not None else "Failed to load OCSF schema")
-exit()
+    types: list[dict[str, Any]] = []
+    for type_name, type_info in ocsf_schema.types.items():
+        type: dict[str, Any] = {"name": type_name}
+        type.update(asdict(type_info))
+        types.append(type)
 
-# Generate Arrow schema for Vulnerability Finding (class 2002)
-vuln_finding_schema = build_arrow_schema(ocsf_schema, "vulnerability_finding")
+    return types
 
-print(vuln_finding_schema)
-# activity_id: int32 not null
-# activity_name: string
-# severity_id: int32 not null
-# severity: string
-# finding_info: string          ← object types flatten to JSON string
-# ...
+
+if __name__ == "__main__":
+    versions = CLIENT.get_versions()
+    files: list[dict[str, str]] = []
+
+    for version in versions:
+        print(f"Processing OCSF version {version}...")
+        file = OUTPUT_DIR / f"ocsf_types_{version}.json"
+        files.append({"version": version, "file": file.as_posix()})
+
+        with open(file, "w") as f:
+            json.dump(ocsf_types(version), f, indent=4)
+
+    if all(Path(file["file"]).exists() for file in files) and len(files) == len(
+        versions
+    ):
+        print("All files created successfully.")
+    else:
+        print("Error: One or more files were not created.")

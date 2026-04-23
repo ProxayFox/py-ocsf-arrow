@@ -1,6 +1,5 @@
 import pytest
 from pathlib import Path
-from typing import Any
 
 from ocsf.api.client import OcsfApiClient
 from ocsf.util import get_schema
@@ -35,7 +34,4 @@ def ocsf_schemas(
     ocsf_client: OcsfApiClient, ocsf_versions: list[str]
 ) -> dict[str, OcsfSchema]:
     """Get the OCSF schemas for the specified versions."""
-    return {
-        version: get_schema(version, ocsf_client)
-        for version in ocsf_versions
-    }
+    return {version: get_schema(version, ocsf_client) for version in ocsf_versions}
