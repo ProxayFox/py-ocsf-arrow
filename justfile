@@ -31,9 +31,9 @@ test-all:
 typecheck:
     uv run ty check --project .
 
-quality: lint lint-fix format-check typecheck test
+quality: lint format-check typecheck test
 
-quality-all: lint lint-fix format-check typecheck test-all
+quality-all: lint format-check typecheck test-all
 
 docs-build:
     uv run --extra docs mkdocs build --strict

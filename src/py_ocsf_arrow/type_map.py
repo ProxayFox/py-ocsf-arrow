@@ -1,10 +1,7 @@
 import pyarrow as pa
-import json
 from functools import cached_property
-from typing import TypeAlias, cast
+from typing import TypeAlias
 from http.client import HTTPResponse
-from urllib.parse import urljoin
-from urllib.request import urlopen
 from urllib.response import addinfourl
 
 # Local Imports
@@ -23,6 +20,7 @@ UrlopenResponse: TypeAlias = HTTPResponse | addinfourl
 
 class TypeMapper(OCSFArrow):
     """Class to handle mapping between OCSF types and PyArrow types."""
+
     _BASE_OCSF_TYPES: dict[str, pa.DataType] = {
         "boolean_t": pa.bool8(),
         "float_t": pa.float32(),

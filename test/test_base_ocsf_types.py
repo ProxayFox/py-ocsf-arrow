@@ -73,7 +73,8 @@ class TestTypeMapper:
         for base_type_name in base_mapping.keys():
             if base_type_name not in ocsf_to_arrow:
                 failures.append(
-                    f"Base type {base_type_name} missing from OCSF_TO_ARROW")
+                    f"Base type {base_type_name} missing from OCSF_TO_ARROW"
+                )
 
         # Verify no None values in mapping
         for type_name, arrow_type in ocsf_to_arrow.items():

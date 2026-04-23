@@ -33,7 +33,6 @@ class OCSFArrow:
         if version == "default":
             version = client.get_default_version()
         elif version not in client.get_versions():
-            raise ValueError(
-                f"Version {version} is not supported by the OCSF API.")
+            raise ValueError(f"Version {version} is not supported by the OCSF API.")
 
         return cls(client=client, version=version, _base_url=base_url)
