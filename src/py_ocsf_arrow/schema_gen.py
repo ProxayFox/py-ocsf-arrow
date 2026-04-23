@@ -1,12 +1,13 @@
-from ocsf.util import get_schema
 import pyarrow as pa
+from ocsf.schema import OcsfSchema
 
-from .type_map import OCSF_TO_ARROW
+# Local Imports
+from . import TypeMapper
 
 
 def ocsf_type_to_arrow(type_name: str, is_array: bool = False) -> pa.DataType:
     """Convert an OCSF type_name to a PyArrow type."""
-    arrow_type = OCSF_TO_ARROW.get(type_name)
+    arrow_type = TypeMapper().OCSF_TO_ARROW.get(type_name)
 
     if arrow_type is None:
         # Unknown or object type — store as JSON string
@@ -18,7 +19,7 @@ def ocsf_type_to_arrow(type_name: str, is_array: bool = False) -> pa.DataType:
     return arrow_type
 
 
-def build_arrow_schema(schema, class_name: str) -> pa.Schema:
+def build_arrow_schema(schema: OcsfSchema, class_name: str) -> pa.Schema:
     """
     Build a PyArrow schema from an OCSF event class definition.
 
