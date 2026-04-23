@@ -13,7 +13,7 @@ authors = [
     { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
 ]
 dependencies = [
-    "ocsf-lib @ git+https://github.com/ProxayFox/ocsf-lib-py.git@c9e302b662fac8c7a8958efdba5bffdcb19f4eff",
+    "ocsf-lib @ git+https://github.com/ProxayFox/ocsf-lib-py.git@426bc9efe26744c46a173e513ea7ce76aa904f74",
     "pyarrow>=23.0.1",
 ]
 
