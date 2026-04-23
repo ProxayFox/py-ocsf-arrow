@@ -23,18 +23,20 @@ format-check:
 
 #  --- Testing ---
 test:
-    uv run pytest -n auto -q
+    uv run pytest -q
 
 test-all:
-    uv run pytest --runslow -n auto -q
+    uv run pytest --runslow -q
 
 typecheck:
     uv run ty check --project .
 
-quality: lint format-check typecheck test
-
-quality-all: lint format-check typecheck test-all
-
+quality:
+    if ! just lint; then just lint-fix; fi
+    if ! just format-check; then just format; fi
+    just typecheck
+    just test
+    
 docs-build:
     uv run --extra docs mkdocs build --strict
 
