@@ -16,10 +16,8 @@ class OCSFArrow:
     version: str
     schema: OcsfSchema
 
-    # List of extensions and profiles to ignore when generating schemas
-    # Flipping the logic so we can just pop these from the schema instead of having to check for them in every method
-    ext: list[str]
-    prf: list[str]
+    # Keep track of which attributes to ignore based on the selected extensions and profiles
+    _ignored_attr: set[str]
 
     @classmethod
     def init(
@@ -81,9 +79,32 @@ class OCSFArrow:
             raise ValueError(f"Version {version} is not supported by the OCSF API.")
         schema = client.get_schema(version=version)
 
+        if schema.profiles is None or schema.extensions is None:
+            raise ValueError(
+                f"Schema version {version} must include both profiles and extensions."
+            )
+
         ext = _items(ext, schema.extensions, "Extension")
         prf = _items(prf, schema.profiles, "Profile")
 
-        return cls(
-            client=client, version=version, schema=schema, ext=ext or [], prf=prf or []
-        )
+        ext_profiles: list[str] = []
+        for ext_name in ext:
+            match ext_name:
+                case "linux":
+                    ext_profiles.append("linux/linux_users")
+                case "macos":
+                    ext_profiles.append("macos/macos_users")
+                case "win":
+                    # No user-related attributes in the Windows extension, so we can skip it entirely
+                    continue
+                case _:
+                    ext_profiles.append(ext_name)
+
+        prf.extend(ext_profiles)
+        attr: set[str] = set()
+
+        for name in prf:
+            attr_expand = schema.profiles[name].attributes.keys()
+            attr.update(attr_expand)
+
+        return cls(client=client, version=version, schema=schema, _ignored_attr=attr)

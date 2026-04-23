@@ -1,11 +1,10 @@
 from .base import OCSFArrow
 from .type_map import TypeMapper
-from .schema_gen import build_arrow_schema, ocsf_type_to_arrow
+from .schema_gen import SchemaGenerator
 
 
 __all__ = [
     "TypeMapper",
-    "build_arrow_schema",
-    "ocsf_type_to_arrow",
+    "SchemaGenerator",
     "OCSFArrow",
 ]
