@@ -7,7 +7,8 @@ from . import TypeMapper
 
 def ocsf_type_to_arrow(type_name: str, is_array: bool = False) -> pa.DataType:
     """Convert an OCSF type_name to a PyArrow type."""
-    arrow_type = TypeMapper().OCSF_TO_ARROW.get(type_name)
+    arrow_type = TypeMapper.init(
+        version="default").OCSF_TO_ARROW.get(type_name)
 
     if arrow_type is None:
         # Unknown or object type — store as JSON string
