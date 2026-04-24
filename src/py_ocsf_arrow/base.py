@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 from ocsf.api.client import OcsfApiClient
-from ocsf.schema import OcsfSchema, OcsfExtension, OcsfProfile
+from ocsf.schema import OcsfSchema
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CACHE_DIR = REPO_ROOT / ".cache"
