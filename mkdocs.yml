@@ -1,0 +1,45 @@
+site_name: py-ocsf-arrow
+site_description: Versioned OCSF-to-Apache Arrow schemas for Python
+repo_url: https://github.com/ProxayFox/py-ocsf-arrow
+repo_name: ProxayFox/py-ocsf-arrow
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Using generated schemas:
+      - Schema generation: schema-generation.md
+      - Schema loading: schema-loading.md
+  - API:
+      - OCSFArrow: api/ocsf-arrow.md
+      - SchemaGenerator: api/schema-generator.md
+      - TypeMapper: api/type-mapper.md
+  - Architecture: architecture.md
+  - Project status: status.md
+  - Contributing:
+      - Documentation: contributing/docs.md

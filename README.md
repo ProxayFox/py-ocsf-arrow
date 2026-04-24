@@ -5,6 +5,8 @@ Python seed for an OCSF Arrow ecosystem: reusable libraries that turn security-p
 > [!WARNING]
 > This repository is still pre-alpha. The architecture and API examples below describe the intended direction; the current implementation is mostly scaffolding with a placeholder launcher.
 
+Full project documentation now lives under [`docs/`](docs/) and can be built locally with `just docs-build` or served with `just docs-serve`.
+
 ## Why this project exists
 
 Security reporting pipelines often grow inside a monolith as one-off transformation code. That usually works right up until it very much does not.
@@ -74,21 +76,20 @@ Separate packages for HTTP/API access.
 
 ## Current repository status
 
-Today this repository is the seed project, not the finished library. At the moment it contains:
+Today this repository is still the seed project, but it has moved beyond a blank template. At the moment it contains:
 
-- a placeholder `main.py` that prints a greeting
-- a minimal `pyproject.toml`
-- empty `src/` and `test/` directories
-- development scaffolding via `.devcontainer/` and `flake.nix`
-- no implementation modules or runtime dependencies yet
+- runtime helpers in `src/py_ocsf_arrow/` for OCSF schema loading, type mapping, and Arrow schema generation
+- a generator script that materializes versioned schema modules under `src/py_ocsf_arrow/schema/<version>/`
+- tests covering type mapping, nested object struct generation, and generated-module loading
+- MkDocs-based documentation scaffolding under `docs/` plus `mkdocs.yml`
+- development scaffolding via `.devcontainer/`, `flake.nix`, `justfile`, and `pyproject.toml`
 
 That means the following are still planned work:
 
-- [ ] OCSF enum tables and lookup helpers
-- [ ] Arrow schemas for key OCSF classes
 - [ ] batch builder or container APIs
 - [ ] provider-specific transforms, starting with Defender vulnerability mappings
-- [ ] tests, fixtures, and usage examples
+- [ ] richer end-to-end examples built from real provider data
+- [ ] API stabilization and packaging polish
 
 ## Repository layout today
 
@@ -96,10 +97,15 @@ That means the following are still planned work:
 .
 ├── .devcontainer/          # VS Code dev container and Dockerfile
 ├── .github/                # Copilot and repository automation files
-├── src/                    # Reserved for future package code
-├── test/                   # Placeholder test directory
+├── docs/                   # MkDocs site content
+├── scripts/                # Code generation utilities
+├── src/
+│   └── py_ocsf_arrow/      # Runtime helpers and generated schema modules
+├── test/                   # Tests for mapping, schema generation, and loading
 ├── flake.nix               # Nix development shell
+├── justfile                # Local development shortcuts
 ├── main.py                 # Placeholder launcher
+├── mkdocs.yml              # MkDocs site configuration
 ├── pyproject.toml          # Project metadata
 └── README.md
 ```
@@ -115,6 +121,12 @@ The dev container is based on `mcr.microsoft.com/devcontainers/python:3-3.14-tri
 ```bash
 uv sync
 uv run python main.py
+```
+
+For contributor workflows including docs and tests:
+
+```bash
+uv sync --group dev --extra docs
 ```
 
 ### Generate callable schema modules
