@@ -36,7 +36,12 @@ quality:
     if ! just format-check; then just format; fi
     just typecheck
     just test
-    
+
+# --- Generation ---
+generate VERSION="all":
+    uv run scripts/generate_schema_module.py --version {{VERSION}}
+
+# --- Documentation ---
 docs-build:
     uv run --extra docs mkdocs build --strict
 

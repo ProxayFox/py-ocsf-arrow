@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pyarrow as pa
 
+from ocsf.api.client import OcsfApiClient
 from py_ocsf_arrow import SchemaGenerator
+from py_ocsf_arrow.base import CACHE_DIR
 
 # ---------------------------------------------------------------------------
 # Scalar Arrow type renderer
@@ -169,10 +171,45 @@ def _render_fields_block(
     return "\n".join(lines)
 
 
-def _imports_block(direct_deps: set[str], package: str) -> str:
+def _imports_block(direct_deps: set[str], objects_path_expr: str) -> str:
+    """Return the import preamble for a generated schema file.
+
+    Because version directories contain dots (e.g. ``1.8.0``), normal dotted
+    imports are impossible.  Instead, dependency schemas are loaded at module
+    level via ``importlib.util.spec_from_file_location`` using a file-system
+    path relative to ``__file__``.
+
+    *objects_path_expr* is a Python expression that evaluates to the ``Path``
+    of the objects directory — for object files this is
+    ``Path(__file__).parent``, for class files it navigates up to the version
+    root and into ``objects/``.
+    """
     lines = ["import pyarrow as pa"]
+    if not direct_deps:
+        return "\n".join(lines)
+
+    lines = [
+        "import importlib.util",
+        "from pathlib import Path",
+        "",
+        "import pyarrow as pa",
+        "",
+        f"_OBJECTS_DIR = {objects_path_expr}",
+        "",
+        "",
+        "def _load_dep(name: str):",
+        "    spec = importlib.util.spec_from_file_location(",
+        '        name, _OBJECTS_DIR / f"{name}.py"',
+        "    )",
+        "    assert spec is not None and spec.loader is not None",
+        "    mod = importlib.util.module_from_spec(spec)",
+        "    spec.loader.exec_module(mod)",
+        "    return mod",
+    ]
+
     for dep in sorted(direct_deps):
-        lines.append(f"from {package}.{dep} import {dep.upper()}_SCHEMA")
+        lines.append(f'{dep.upper()}_SCHEMA = _load_dep("{dep}").{dep.upper()}_SCHEMA')
+
     return "\n".join(lines)
 
 
@@ -181,7 +218,6 @@ def _render_object_file(
     generator: SchemaGenerator,
     version: str,
     timestamp: str,
-    objects_package: str,
     allowed_deps: set[str],
 ) -> str:
     ocsf_obj = generator.schema.objects[object_name]
@@ -201,11 +237,14 @@ def _render_object_file(
     fn_name = f"get_{object_name}_schema"
     const_name = f"{object_name.upper()}_SCHEMA"
 
+    # Object files import siblings from the same directory.
+    objects_path_expr = "Path(__file__).parent"
+
     return (
         f'"""Auto-generated Arrow schema for OCSF object \'{object_name}\'.\n\n'
         f"Generated from version {version} at {timestamp}.\n"
         '"""\n\n'
-        f"{_imports_block(direct_deps, objects_package)}\n\n\n"
+        f"{_imports_block(direct_deps, objects_path_expr)}\n\n\n"
         f"def {fn_name}() -> pa.Schema:\n"
         f'    """Return the Arrow schema for OCSF object \'{object_name}\'."""\n'
         "    return pa.schema(\n"
@@ -222,7 +261,6 @@ def _render_class_file(
     generator: SchemaGenerator,
     version: str,
     timestamp: str,
-    objects_package: str,
 ) -> str:
     event_class = generator.schema.classes[class_name]
     type_map = generator._type_mapper.OCSF_TO_ARROW
@@ -241,11 +279,15 @@ def _render_class_file(
     fn_name = f"get_{class_name}_schema"
     const_name = f"{class_name.upper()}_SCHEMA"
 
+    # Class files live at categories/<cat>/<uid>_<name>.py — objects dir is
+    # two levels up at the version root.
+    objects_path_expr = 'Path(__file__).resolve().parents[2] / "objects"'
+
     return (
         f'"""Auto-generated Arrow schema for OCSF class \'{class_name}\'.\n\n'
         f"Generated from version {version} at {timestamp}.\n"
         '"""\n\n'
-        f"{_imports_block(direct_deps, objects_package)}\n\n\n"
+        f"{_imports_block(direct_deps, objects_path_expr)}\n\n\n"
         f"def {fn_name}() -> pa.Schema:\n"
         f'    """Return the Arrow schema for OCSF class \'{class_name}\'."""\n'
         "    return pa.schema(\n"
@@ -361,47 +403,24 @@ def _render_category_init(
 # ---------------------------------------------------------------------------
 
 
-def build_parser() -> ArgumentParser:
-    parser = ArgumentParser(
-        description=(
-            "Generate split Python schema modules from OCSF classes, organized "
-            "by category.  Each OCSF object gets a shared file under "
-            "--objects-dir; class files are placed under categories/<uid>_<name>/."
-        )
-    )
-    parser.add_argument(
-        "--class-name",
-        default=None,
-        help="OCSF class name to render (default: all classes)",
-    )
-    parser.add_argument(
-        "--version",
-        default="default",
-        help="OCSF schema version (default: default)",
-    )
-    parser.add_argument(
-        "--schema-dir",
-        default="src/py_ocsf_arrow/schema",
-        help="Root schema directory (default: src/py_ocsf_arrow/schema)",
-    )
-    parser.add_argument(
-        "--objects-dir",
-        default=None,
-        help="Directory for per-object schema files (default: <schema-dir>/objects)",
-    )
-    return parser
+def _is_stable_version(version: str) -> bool:
+    """Return True if *version* is a stable release (no -rc or -dev suffix)."""
+    return "-rc" not in version and "-dev" not in version
 
 
-def main() -> None:
-    args = build_parser().parse_args()
-
-    schema_dir = Path(args.schema_dir)
-    objects_dir = Path(args.objects_dir) if args.objects_dir else schema_dir / "objects"
-    categories_dir = schema_dir / "categories"
-
-    generator = SchemaGenerator.init(version=args.version)
+def _generate_version(
+    version_str: str,
+    version_dir: Path,
+    class_name_filter: str | None,
+    client: OcsfApiClient,
+) -> None:
+    """Generate object and class schema files for one OCSF version."""
+    generator = SchemaGenerator.init(version=version_str, client=client)
     version = generator.version
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+    objects_dir = version_dir / "objects"
+    categories_dir = version_dir / "categories"
 
     type_map = generator._type_mapper.OCSF_TO_ARROW
     schema_objects = generator.schema.objects
@@ -420,7 +439,7 @@ def main() -> None:
     all_class_names: set[str] = set()
 
     for cls in generator.schema.classes.values():
-        if args.class_name and cls.name != args.class_name:
+        if class_name_filter and cls.name != class_name_filter:
             continue
         if cls.uid is None:
             continue
@@ -432,7 +451,7 @@ def main() -> None:
         all_class_names.add(cls.name)
 
     if not all_class_names:
-        print(f"No classes found matching --class-name={args.class_name!r}")
+        print(f"  no classes found matching --class-name={class_name_filter!r}")
         return
 
     # Discover all transitively required objects across all selected classes.
@@ -447,8 +466,6 @@ def main() -> None:
         top_level_object_deps, schema_objects, type_map, ignored
     )
 
-    objects_package = _dir_to_package(objects_dir)
-
     # Write object files.
     objects_dir.mkdir(parents=True, exist_ok=True)
     init_file = objects_dir / "__init__.py"
@@ -462,11 +479,10 @@ def main() -> None:
             generator,
             version,
             timestamp,
-            objects_package,
             allowed_deps=dep_graph[obj_name],
         )
         obj_file.write_text(content, encoding="utf-8")
-        print(f"  wrote object: {obj_file}")
+        print(f"    wrote object: {obj_file}")
 
     # Write class files grouped by category.
     categories_dir.mkdir(parents=True, exist_ok=True)
@@ -480,19 +496,85 @@ def main() -> None:
 
         for full_uid, class_name in sorted(entries):
             class_file = cat_dir / f"{full_uid}_{class_name}.py"
-            content = _render_class_file(
-                class_name, generator, version, timestamp, objects_package
-            )
+            content = _render_class_file(class_name, generator, version, timestamp)
             class_file.write_text(content, encoding="utf-8")
-            print(f"  wrote class: {class_file}")
+            print(f"    wrote class: {class_file}")
 
         # Generate __init__.py for this category.
         cat_package = _dir_to_package(cat_dir)
         init_content = _render_category_init(entries, cat_package)
         (cat_dir / "__init__.py").write_text(init_content, encoding="utf-8")
-        print(f"  wrote init:  {cat_dir / '__init__.py'}")
+        print(f"    wrote init:  {cat_dir / '__init__.py'}")
 
-    print(f"\ntotal objects: {len(dep_graph)}, total classes: {len(all_class_names)}")
+    # Write version-level __init__.py.
+    version_init = version_dir / "__init__.py"
+    if not version_init.exists():
+        version_init.write_text(f'"""Auto-generated OCSF schema v{version}."""\n')
+
+    print(
+        f"  version {version}: "
+        f"{len(dep_graph)} objects, {len(all_class_names)} classes"
+    )
+
+
+def build_parser() -> ArgumentParser:
+    parser = ArgumentParser(
+        description=(
+            "Generate versioned Python schema modules from OCSF classes, "
+            "organized by category.  Each version gets its own isolated tree "
+            "under <schema-dir>/<version>/."
+        )
+    )
+    parser.add_argument(
+        "--class-name",
+        default=None,
+        help="OCSF class name to render (default: all classes)",
+    )
+    parser.add_argument(
+        "--version",
+        default="all",
+        help=(
+            'OCSF schema version to generate: a version string (e.g. "1.8.0"), '
+            '"default" for the latest stable, or "all" for every stable release '
+            "(default: all)"
+        ),
+    )
+    parser.add_argument(
+        "--schema-dir",
+        default="src/py_ocsf_arrow/schema",
+        help="Root schema directory (default: src/py_ocsf_arrow/schema)",
+    )
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+
+    schema_dir = Path(args.schema_dir)
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    schema_init = schema_dir / "__init__.py"
+    if not schema_init.exists():
+        schema_init.write_text(
+            '"""Schema modules generated from OCSF class definitions."""\n'
+        )
+
+    client = OcsfApiClient(cache_dir=CACHE_DIR)
+
+    # Resolve which versions to generate.
+    if args.version == "all":
+        versions = [v for v in client.get_versions() if _is_stable_version(v)]
+    elif args.version == "default":
+        versions = [client.get_default_version()]
+    else:
+        versions = [args.version]
+
+    print(f"Generating schemas for {len(versions)} version(s): {versions}")
+
+    for version_str in sorted(versions):
+        version_dir = schema_dir / version_str
+        _generate_version(version_str, version_dir, args.class_name, client)
+
+    print("\nDone.")
 
 
 if __name__ == "__main__":

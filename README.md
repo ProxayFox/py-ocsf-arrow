@@ -119,30 +119,50 @@ uv run python main.py
 
 ### Generate callable schema modules
 
-Use the generator script to materialize OCSF class schemas as importable Python code, organized by category:
+Use the generator script to materialize OCSF class schemas as importable Python code, organized by version and category:
 
 ```bash
+# Generate all stable OCSF versions (default)
 uv run scripts/generate_schema_module.py
-```
 
-By default, this generates all OCSF classes into:
+# Or use the justfile shortcut
+just generate
 
-- `src/py_ocsf_arrow/schema/objects/` — shared object schema files
-- `src/py_ocsf_arrow/schema/categories/<uid>_<name>/` — class files grouped by OCSF category
+# Generate a single version
+just generate 1.8.0
 
-You can generate a single class instead:
-
-```bash
+# Generate only one class across all versions
 uv run scripts/generate_schema_module.py --class-name vulnerability_finding
 ```
 
-Use the category package to import a generated schema:
+This produces a versioned directory tree under `src/py_ocsf_arrow/schema/`:
+
+```text
+schema/
+  1.0.0/
+    objects/        ← shared object schema files for this version
+    categories/     ← class files grouped by OCSF category
+      2_findings/
+        2002_vulnerability_finding.py
+        ...
+  1.1.0/
+    ...
+  1.8.0/
+    ...
+```
+
+Use `importlib` to load a versioned schema (version directories contain dots):
 
 ```python
-import importlib
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
 
-findings = importlib.import_module("py_ocsf_arrow.schema.categories.2_findings")
-schema = findings.get_vulnerability_finding_schema()
+init_path = Path("src/py_ocsf_arrow/schema/1.8.0/categories/2_findings/__init__.py")
+spec = spec_from_file_location("findings", init_path)
+mod = module_from_spec(spec)
+spec.loader.exec_module(mod)
+
+schema = mod.get_vulnerability_finding_schema()
 ```
 
 ### With Nix
