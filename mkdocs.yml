@@ -38,6 +38,7 @@ nav:
   - API:
       - OCSFArrow: api/ocsf-arrow.md
       - SchemaGenerator: api/schema-generator.md
+      - SchemaLoader: api/schema-loader.md
       - TypeMapper: api/type-mapper.md
   - Architecture: architecture.md
   - Project status: status.md

@@ -512,8 +512,7 @@ def _generate_version(
         version_init.write_text(f'"""Auto-generated OCSF schema v{version}."""\n')
 
     print(
-        f"  version {version}: "
-        f"{len(dep_graph)} objects, {len(all_class_names)} classes"
+        f"  version {version}: {len(dep_graph)} objects, {len(all_class_names)} classes"
     )
 
 
