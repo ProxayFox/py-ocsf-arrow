@@ -1,0 +1,26 @@
+"""Auto-generated Arrow schema for OCSF object 'session'.
+
+Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+"""
+
+import pyarrow as pa
+
+
+def get_session_schema() -> pa.Schema:
+    """Return the Arrow schema for OCSF object 'session'."""
+    return pa.schema(
+        [
+            pa.field("created_time", pa.int64(), nullable=True),
+            pa.field("created_time_dt", pa.string(), nullable=True),
+            pa.field("credential_uid", pa.string(), nullable=True),
+            pa.field("expiration_time", pa.int64(), nullable=True),
+            pa.field("expiration_time_dt", pa.string(), nullable=True),
+            pa.field("is_remote", pa.bool8(), nullable=True),
+            pa.field("issuer", pa.string(), nullable=True),
+            pa.field("uid", pa.string(), nullable=True),
+            pa.field("uuid", pa.string(), nullable=True),
+        ]
+    )
+
+
+SESSION_SCHEMA = get_session_schema()

@@ -1,0 +1,49 @@
+"""Auto-generated Arrow schema for OCSF object 'network_proxy'.
+
+Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+"""
+
+import importlib.util
+from pathlib import Path
+
+import pyarrow as pa
+
+_OBJECTS_DIR = Path(__file__).parent
+
+
+def _load_dep(name: str):
+    spec = importlib.util.spec_from_file_location(name, _OBJECTS_DIR / f"{name}.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+LOCATION_SCHEMA = _load_dep("location").LOCATION_SCHEMA
+
+
+def get_network_proxy_schema() -> pa.Schema:
+    """Return the Arrow schema for OCSF object 'network_proxy'."""
+    return pa.schema(
+        [
+            pa.field("domain", pa.string(), nullable=True),
+            pa.field("hostname", pa.string(), nullable=True),
+            pa.field("instance_uid", pa.string(), nullable=True),
+            pa.field("interface_name", pa.string(), nullable=True),
+            pa.field("interface_uid", pa.string(), nullable=True),
+            pa.field("intermediate_ips", pa.list_(pa.string()), nullable=True),
+            pa.field("ip", pa.string(), nullable=True),
+            pa.field("location", pa.struct(list(LOCATION_SCHEMA)), nullable=True),
+            pa.field("mac", pa.string(), nullable=True),
+            pa.field("name", pa.string(), nullable=True),
+            pa.field("port", pa.int32(), nullable=True),
+            pa.field("subnet_uid", pa.string(), nullable=True),
+            pa.field("svc_name", pa.string(), nullable=True),
+            pa.field("uid", pa.string(), nullable=True),
+            pa.field("vlan_uid", pa.string(), nullable=True),
+            pa.field("vpc_uid", pa.string(), nullable=True),
+        ]
+    )
+
+
+NETWORK_PROXY_SCHEMA = get_network_proxy_schema()
