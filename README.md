@@ -117,6 +117,32 @@ uv sync
 uv run python main.py
 ```
 
+### Generate a callable schema module
+
+Use the generator script to materialize an OCSF class schema as importable Python code:
+
+```bash
+uv run scripts/generate_schema_module.py
+```
+
+By default, this writes:
+
+- `src/py_ocsf_arrow/schema/findings/2002_vulnerability_finding.py`
+
+You can override class, version, and destination:
+
+```bash
+uv run scripts/generate_schema_module.py --class-name vulnerability_finding --version default --output src/py_ocsf_arrow/schema/findings/2002_vulnerability_finding.py
+```
+
+Use the package export to call the generated schema function:
+
+```python
+from py_ocsf_arrow.schema.findings import get_vulnerability_finding_schema
+
+schema = get_vulnerability_finding_schema()
+```
+
 ### With Nix
 
 ```bash
