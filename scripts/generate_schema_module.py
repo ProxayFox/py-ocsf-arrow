@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import re
 from argparse import ArgumentParser
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pyarrow as pa
@@ -165,9 +164,21 @@ def _render_fields_block(
             allowed_object_deps,
         )
         nullable = attr.requirement != "required"
-        lines.append(
-            f"        pa.field({json.dumps(attr_name)}, {type_expr}, nullable={nullable}),"
+        field_line = (
+            f"pa.field({json.dumps(attr_name)}, {type_expr}, nullable={nullable}),"
         )
+        # Ruff wants 12-space indent (3 levels: function body → list → item).
+        # Wrap long lines across multiple arguments.
+        if len(field_line) + 12 <= 88:
+            lines.append(f"            {field_line}")
+        else:
+            lines.append(
+                f"            pa.field(\n"
+                f"                {json.dumps(attr_name)},\n"
+                f"                {type_expr},\n"
+                f"                nullable={nullable},\n"
+                f"            ),"
+            )
     return "\n".join(lines)
 
 
@@ -198,17 +209,24 @@ def _imports_block(direct_deps: set[str], objects_path_expr: str) -> str:
         "",
         "",
         "def _load_dep(name: str):",
-        "    spec = importlib.util.spec_from_file_location(",
-        '        name, _OBJECTS_DIR / f"{name}.py"',
-        "    )",
+        '    spec = importlib.util.spec_from_file_location(name, _OBJECTS_DIR / f"{name}.py")',
         "    assert spec is not None and spec.loader is not None",
         "    mod = importlib.util.module_from_spec(spec)",
         "    spec.loader.exec_module(mod)",
         "    return mod",
+        "",
+        "",
     ]
 
     for dep in sorted(direct_deps):
-        lines.append(f'{dep.upper()}_SCHEMA = _load_dep("{dep}").{dep.upper()}_SCHEMA')
+        line = f'{dep.upper()}_SCHEMA = _load_dep("{dep}").{dep.upper()}_SCHEMA'
+        if len(line) > 88:
+            line = (
+                f"{dep.upper()}_SCHEMA = _load_dep(\n"
+                f'    "{dep}"\n'
+                f").{dep.upper()}_SCHEMA"
+            )
+        lines.append(line)
 
     return "\n".join(lines)
 
@@ -217,7 +235,6 @@ def _render_object_file(
     object_name: str,
     generator: SchemaGenerator,
     version: str,
-    timestamp: str,
     allowed_deps: set[str],
     ignored_attrs: set[str] | None = None,
 ) -> str:
@@ -241,19 +258,26 @@ def _render_object_file(
     # Object files import siblings from the same directory.
     objects_path_expr = "Path(__file__).parent"
 
+    if fields_block.strip():
+        schema_body = (
+            f"    return pa.schema(\n        [\n{fields_block}\n        ]\n    )\n"
+        )
+    else:
+        schema_body = "    return pa.schema([])\n"
+
+    const_line = f"{const_name} = {fn_name}()\n"
+    if len(const_line.rstrip()) > 88:
+        const_line = f"{const_name} = (\n    {fn_name}()\n)\n"
+
     return (
         f'"""Auto-generated Arrow schema for OCSF object \'{object_name}\'.\n\n'
-        f"Generated from version {version} at {timestamp}.\n"
+        f"OCSF version {version}.\n"
         '"""\n\n'
         f"{_imports_block(direct_deps, objects_path_expr)}\n\n\n"
         f"def {fn_name}() -> pa.Schema:\n"
         f'    """Return the Arrow schema for OCSF object \'{object_name}\'."""\n'
-        "    return pa.schema(\n"
-        "        [\n"
-        f"{fields_block}\n"
-        "        ]\n"
-        "    )\n\n\n"
-        f"{const_name} = {fn_name}()\n"
+        f"{schema_body}\n\n"
+        f"{const_line}"
     )
 
 
@@ -261,7 +285,6 @@ def _render_class_file(
     class_name: str,
     generator: SchemaGenerator,
     version: str,
-    timestamp: str,
     ignored_attrs: set[str] | None = None,
 ) -> str:
     event_class = generator.schema.classes[class_name]
@@ -285,19 +308,26 @@ def _render_class_file(
     # two levels up at the version root.
     objects_path_expr = 'Path(__file__).resolve().parents[2] / "objects"'
 
+    if fields_block.strip():
+        schema_body = (
+            f"    return pa.schema(\n        [\n{fields_block}\n        ]\n    )\n"
+        )
+    else:
+        schema_body = "    return pa.schema([])\n"
+
+    const_line = f"{const_name} = {fn_name}()\n"
+    if len(const_line.rstrip()) > 88:
+        const_line = f"{const_name} = (\n    {fn_name}()\n)\n"
+
     return (
         f'"""Auto-generated Arrow schema for OCSF class \'{class_name}\'.\n\n'
-        f"Generated from version {version} at {timestamp}.\n"
+        f"OCSF version {version}.\n"
         '"""\n\n'
         f"{_imports_block(direct_deps, objects_path_expr)}\n\n\n"
         f"def {fn_name}() -> pa.Schema:\n"
         f'    """Return the Arrow schema for OCSF class \'{class_name}\'."""\n'
-        "    return pa.schema(\n"
-        "        [\n"
-        f"{fields_block}\n"
-        "        ]\n"
-        "    )\n\n\n"
-        f"{const_name} = {fn_name}()\n"
+        f"{schema_body}\n\n"
+        f"{const_line}"
     )
 
 
@@ -350,13 +380,34 @@ def _render_category_init(
         const = f"{class_name.upper()}_SCHEMA"
         internal = f"{package_name}._{full_uid}_{class_name}"
 
+        # Detect lines that would exceed 88 chars and wrap them.
+        module_path_line = f'    module_path = Path(__file__).with_name("{filename}")'
+        if len(module_path_line) > 88:
+            module_path_lines = [
+                "    module_path = Path(__file__).with_name(",
+                f'        "{filename}"',
+                "    )",
+            ]
+        else:
+            module_path_lines = [module_path_line]
+
+        const_line = f"{const} = {getter}()"
+        if len(const_line) > 88:
+            const_lines = [
+                f"{const} = (",
+                f"    {getter}()",
+                ")",
+            ]
+        else:
+            const_lines = [const_line]
+
         lines.extend(
             [
                 "",
                 "",
                 "@lru_cache(maxsize=1)",
                 f"def {loader}() -> ModuleType:",
-                f'    module_path = Path(__file__).with_name("{filename}")',
+                *module_path_lines,
                 "    spec = spec_from_file_location(",
                 f'        "{internal}",',
                 "        module_path,",
@@ -364,17 +415,47 @@ def _render_category_init(
                 "    if spec is None or spec.loader is None:",
                 '        raise ImportError(f"Unable to load schema module from {module_path}")',
                 "    module = module_from_spec(spec)",
-                f'    module.__package__ = "{package_name}"',
+                *(
+                    [
+                        f'    module.__package__ = "{package_name}"',
+                    ]
+                    if len(f'    module.__package__ = "{package_name}"') <= 88
+                    else [
+                        "    module.__package__ = (",
+                        f'        "{package_name}"',
+                        "    )",
+                    ]
+                ),
                 "    spec.loader.exec_module(module)",
                 "    return module",
                 "",
                 "",
                 f"def {getter}():",
                 f'    """Return the generated Arrow schema for OCSF class {full_uid}."""',
-                f"    return {loader}().{getter}()",
+            ]
+        )
+
+        return_expr = f"{loader}().{getter}()"
+        return_line = f"    return {return_expr}"
+        # ruff wraps return statements only when the indented inner line
+        # fits within 88 chars (otherwise wrapping doesn't help).
+        inner_line = f"        {return_expr}"
+        if len(return_line) > 88 and len(inner_line) <= 88:
+            lines.extend(
+                [
+                    "    return (",
+                    f"        {return_expr}",
+                    "    )",
+                ]
+            )
+        else:
+            lines.append(return_line)
+
+        lines.extend(
+            [
                 "",
                 "",
-                f"{const} = {getter}()",
+                *const_lines,
             ]
         )
 
@@ -433,10 +514,8 @@ def _write_profile_metadata(
         "extension_profiles": extension_profiles,
     }
     path = version_dir / "_profiles.json"
-    path.write_text(
-        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    print(f"    wrote metadata: {path}")
+    content = json.dumps(metadata, indent=2, sort_keys=True) + "\n"
+    _write_if_changed(path, content)
 
 
 # ---------------------------------------------------------------------------
@@ -449,6 +528,20 @@ def _is_stable_version(version: str) -> bool:
     return "-rc" not in version and "-dev" not in version
 
 
+def _write_if_changed(path: Path, content: str) -> bool:
+    """Write *content* to *path* only if it differs from the current contents.
+
+    Returns True if the file was written, False if it was already up to date.
+    """
+    try:
+        if path.read_text(encoding="utf-8") == content:
+            return False
+    except FileNotFoundError:
+        pass
+    path.write_text(content, encoding="utf-8")
+    return True
+
+
 def _generate_version(
     version_str: str,
     version_dir: Path,
@@ -458,7 +551,6 @@ def _generate_version(
     """Generate object and class schema files for one OCSF version."""
     generator = SchemaGenerator.init(version=version_str, client=client)
     version = generator.version
-    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
     objects_dir = version_dir / "objects"
     categories_dir = version_dir / "categories"
@@ -512,6 +604,8 @@ def _generate_version(
     )
 
     # Write object files.
+    written = 0
+    skipped = 0
     objects_dir.mkdir(parents=True, exist_ok=True)
     init_file = objects_dir / "__init__.py"
     if not init_file.exists():
@@ -523,12 +617,13 @@ def _generate_version(
             obj_name,
             generator,
             version,
-            timestamp,
             allowed_deps=dep_graph[obj_name],
             ignored_attrs=ignored,
         )
-        obj_file.write_text(content, encoding="utf-8")
-        print(f"    wrote object: {obj_file}")
+        if _write_if_changed(obj_file, content):
+            written += 1
+        else:
+            skipped += 1
 
     # Write class files grouped by category.
     categories_dir.mkdir(parents=True, exist_ok=True)
@@ -543,16 +638,20 @@ def _generate_version(
         for full_uid, class_name in sorted(entries):
             class_file = cat_dir / f"{full_uid}_{class_name}.py"
             content = _render_class_file(
-                class_name, generator, version, timestamp, ignored_attrs=ignored
+                class_name, generator, version, ignored_attrs=ignored
             )
-            class_file.write_text(content, encoding="utf-8")
-            print(f"    wrote class: {class_file}")
+            if _write_if_changed(class_file, content):
+                written += 1
+            else:
+                skipped += 1
 
         # Generate __init__.py for this category.
         cat_package = _dir_to_package(cat_dir)
         init_content = _render_category_init(entries, cat_package)
-        (cat_dir / "__init__.py").write_text(init_content, encoding="utf-8")
-        print(f"    wrote init:  {cat_dir / '__init__.py'}")
+        if _write_if_changed(cat_dir / "__init__.py", init_content):
+            written += 1
+        else:
+            skipped += 1
 
     # Write version-level __init__.py.
     version_init = version_dir / "__init__.py"
@@ -560,7 +659,9 @@ def _generate_version(
         version_init.write_text(f'"""Auto-generated OCSF schema v{version}."""\n')
 
     print(
-        f"  version {version}: {len(dep_graph)} objects, {len(all_class_names)} classes"
+        f"  version {version}: {len(dep_graph)} objects, "
+        f"{len(all_class_names)} classes "
+        f"({written} written, {skipped} unchanged)"
     )
 
 
