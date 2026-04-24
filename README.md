@@ -117,30 +117,32 @@ uv sync
 uv run python main.py
 ```
 
-### Generate a callable schema module
+### Generate callable schema modules
 
-Use the generator script to materialize an OCSF class schema as importable Python code:
+Use the generator script to materialize OCSF class schemas as importable Python code, organized by category:
 
 ```bash
 uv run scripts/generate_schema_module.py
 ```
 
-By default, this writes:
+By default, this generates all OCSF classes into:
 
-- `src/py_ocsf_arrow/schema/findings/2002_vulnerability_finding.py`
+- `src/py_ocsf_arrow/schema/objects/` — shared object schema files
+- `src/py_ocsf_arrow/schema/categories/<uid>_<name>/` — class files grouped by OCSF category
 
-You can override class, version, and destination:
+You can generate a single class instead:
 
 ```bash
-uv run scripts/generate_schema_module.py --class-name vulnerability_finding --version default --output src/py_ocsf_arrow/schema/findings/2002_vulnerability_finding.py
+uv run scripts/generate_schema_module.py --class-name vulnerability_finding
 ```
 
-Use the package export to call the generated schema function:
+Use the category package to import a generated schema:
 
 ```python
-from py_ocsf_arrow.schema.findings import get_vulnerability_finding_schema
+import importlib
 
-schema = get_vulnerability_finding_schema()
+findings = importlib.import_module("py_ocsf_arrow.schema.categories.2_findings")
+schema = findings.get_vulnerability_finding_schema()
 ```
 
 ### With Nix

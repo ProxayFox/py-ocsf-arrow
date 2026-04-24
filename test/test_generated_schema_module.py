@@ -1,9 +1,10 @@
+import importlib
+
 import pyarrow as pa
 
-from py_ocsf_arrow.schema.findings import (
-    VULNERABILITY_FINDING_SCHEMA,
-    get_vulnerability_finding_schema,
-)
+_findings = importlib.import_module("py_ocsf_arrow.schema.categories.2_findings")
+get_vulnerability_finding_schema = _findings.get_vulnerability_finding_schema
+VULNERABILITY_FINDING_SCHEMA = _findings.VULNERABILITY_FINDING_SCHEMA
 
 
 def test_generated_schema_module_is_callable() -> None:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from argparse import ArgumentParser
 from datetime import datetime, timezone
 from pathlib import Path
@@ -257,6 +258,105 @@ def _render_class_file(
 
 
 # ---------------------------------------------------------------------------
+# Category layout helpers
+# ---------------------------------------------------------------------------
+
+
+def _sanitize_dir_name(name: str) -> str:
+    """Lowercase *name* and replace non-alphanumeric runs with underscores."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+
+
+def _dir_to_package(directory: Path, src_root: Path = Path("src")) -> str:
+    """Convert a file-system path to a dotted Python package name."""
+    try:
+        rel = directory.relative_to(src_root)
+    except ValueError:
+        rel = directory
+    return ".".join(rel.parts)
+
+
+def _render_category_init(
+    class_entries: list[tuple[int, str]],
+    package_name: str,
+) -> str:
+    """Return Python source for a category ``__init__.py`` that lazy-loads class files."""
+    lines: list[str] = [
+        '"""Auto-generated OCSF category schema exports.',
+        "",
+        "Class files have numeric-prefixed names which Python cannot import with",
+        "a normal ``import`` statement.  They are loaded via ``importlib`` and",
+        "exposed as a stable API from this package.",
+        '"""',
+        "",
+        "from __future__ import annotations",
+        "",
+        "from functools import lru_cache",
+        "from importlib.util import module_from_spec, spec_from_file_location",
+        "from pathlib import Path",
+        "from types import ModuleType",
+    ]
+
+    all_names: list[str] = []
+
+    for full_uid, class_name in sorted(class_entries):
+        filename = f"{full_uid}_{class_name}.py"
+        loader = f"_load_{class_name}_module"
+        getter = f"get_{class_name}_schema"
+        const = f"{class_name.upper()}_SCHEMA"
+        internal = f"{package_name}._{full_uid}_{class_name}"
+
+        lines.extend(
+            [
+                "",
+                "",
+                "@lru_cache(maxsize=1)",
+                f"def {loader}() -> ModuleType:",
+                f'    module_path = Path(__file__).with_name("{filename}")',
+                "    spec = spec_from_file_location(",
+                f'        "{internal}",',
+                "        module_path,",
+                "    )",
+                "    if spec is None or spec.loader is None:",
+                '        raise ImportError(f"Unable to load schema module from {module_path}")',
+                "    module = module_from_spec(spec)",
+                f'    module.__package__ = "{package_name}"',
+                "    spec.loader.exec_module(module)",
+                "    return module",
+                "",
+                "",
+                f"def {getter}():",
+                f'    """Return the generated Arrow schema for OCSF class {full_uid}."""',
+                f"    return {loader}().{getter}()",
+                "",
+                "",
+                f"{const} = {getter}()",
+            ]
+        )
+
+        all_names.append(getter)
+        all_names.append(const)
+
+    lines.extend(
+        [
+            "",
+            "",
+            "__all__ = [",
+        ]
+    )
+    for name in all_names:
+        lines.append(f'    "{name}",')
+    lines.extend(
+        [
+            "]",
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -264,15 +364,15 @@ def _render_class_file(
 def build_parser() -> ArgumentParser:
     parser = ArgumentParser(
         description=(
-            "Generate split Python schema modules from an OCSF class. "
-            "Each referenced OCSF object gets its own file under --objects-dir; "
-            "the class file imports from those objects rather than inlining."
+            "Generate split Python schema modules from OCSF classes, organized "
+            "by category.  Each OCSF object gets a shared file under "
+            "--objects-dir; class files are placed under categories/<uid>_<name>/."
         )
     )
     parser.add_argument(
         "--class-name",
-        default="vulnerability_finding",
-        help="OCSF class name to render (default: vulnerability_finding)",
+        default=None,
+        help="OCSF class name to render (default: all classes)",
     )
     parser.add_argument(
         "--version",
@@ -280,20 +380,24 @@ def build_parser() -> ArgumentParser:
         help="OCSF schema version (default: default)",
     )
     parser.add_argument(
-        "--output",
-        default="src/py_ocsf_arrow/schema/findings/2002_vulnerability_finding.py",
-        help="Output path for the class schema file",
+        "--schema-dir",
+        default="src/py_ocsf_arrow/schema",
+        help="Root schema directory (default: src/py_ocsf_arrow/schema)",
     )
     parser.add_argument(
         "--objects-dir",
-        default="src/py_ocsf_arrow/schema/objects",
-        help="Directory to write per-object schema files (default: src/py_ocsf_arrow/schema/objects)",
+        default=None,
+        help="Directory for per-object schema files (default: <schema-dir>/objects)",
     )
     return parser
 
 
 def main() -> None:
     args = build_parser().parse_args()
+
+    schema_dir = Path(args.schema_dir)
+    objects_dir = Path(args.objects_dir) if args.objects_dir else schema_dir / "objects"
+    categories_dir = schema_dir / "categories"
 
     generator = SchemaGenerator.init(version=args.version)
     version = generator.version
@@ -302,27 +406,48 @@ def main() -> None:
     type_map = generator._type_mapper.OCSF_TO_ARROW
     schema_objects = generator.schema.objects
     ignored = generator._ignored_attr
-    event_class = generator.schema.classes[args.class_name]
 
-    # Discover which top-level attributes of the class are objects.
+    # Build category UID -> dir-name mapping.
+    cat_info: dict[int, str] = {}
+    categories = generator.schema.categories
+    assert categories is not None, "OCSF schema has no categories"
+    for cat in categories.values():
+        assert cat.uid is not None
+        cat_info[cat.uid] = f"{cat.uid}_{_sanitize_dir_name(cat.caption)}"
+
+    # Group classes by category, optionally filtering by --class-name.
+    category_classes: dict[str, list[tuple[int, str]]] = {}
+    all_class_names: set[str] = set()
+
+    for cls in generator.schema.classes.values():
+        if args.class_name and cls.name != args.class_name:
+            continue
+        if cls.uid is None:
+            continue
+        cat_uid = cls.uid // 1000
+        cat_dir_name = cat_info.get(cat_uid)
+        if cat_dir_name is None:
+            continue  # skip base_event or other uncategorized classes
+        category_classes.setdefault(cat_dir_name, []).append((cls.uid, cls.name))
+        all_class_names.add(cls.name)
+
+    if not all_class_names:
+        print(f"No classes found matching --class-name={args.class_name!r}")
+        return
+
+    # Discover all transitively required objects across all selected classes.
     top_level_object_deps: set[str] = set()
-    for attr in event_class.attributes.values():
-        if attr.type not in type_map and attr.type in schema_objects:
-            top_level_object_deps.add(attr.type)
+    for class_name in all_class_names:
+        event_class = generator.schema.classes[class_name]
+        for attr in event_class.attributes.values():
+            if attr.type not in type_map and attr.type in schema_objects:
+                top_level_object_deps.add(attr.type)
 
-    # BFS to discover all transitively required objects.
     dep_graph = _discover_all_objects(
         top_level_object_deps, schema_objects, type_map, ignored
     )
 
-    # Derive Python package name from the objects directory.
-    objects_dir = Path(args.objects_dir)
-    src_root = Path("src")
-    try:
-        rel = objects_dir.relative_to(src_root)
-        objects_package = ".".join(rel.parts)
-    except ValueError:
-        objects_package = ".".join(objects_dir.parts)
+    objects_package = _dir_to_package(objects_dir)
 
     # Write object files.
     objects_dir.mkdir(parents=True, exist_ok=True)
@@ -343,15 +468,31 @@ def main() -> None:
         obj_file.write_text(content, encoding="utf-8")
         print(f"  wrote object: {obj_file}")
 
-    # Write class file.
-    class_output = Path(args.output)
-    class_output.parent.mkdir(parents=True, exist_ok=True)
-    content = _render_class_file(
-        args.class_name, generator, version, timestamp, objects_package
-    )
-    class_output.write_text(content, encoding="utf-8")
-    print(f"wrote class:  {class_output}")
-    print(f"total objects written: {len(dep_graph)}")
+    # Write class files grouped by category.
+    categories_dir.mkdir(parents=True, exist_ok=True)
+    cat_init = categories_dir / "__init__.py"
+    if not cat_init.exists():
+        cat_init.write_text('"""Auto-generated OCSF category schema packages."""\n')
+
+    for cat_dir_name, entries in sorted(category_classes.items()):
+        cat_dir = categories_dir / cat_dir_name
+        cat_dir.mkdir(parents=True, exist_ok=True)
+
+        for full_uid, class_name in sorted(entries):
+            class_file = cat_dir / f"{full_uid}_{class_name}.py"
+            content = _render_class_file(
+                class_name, generator, version, timestamp, objects_package
+            )
+            class_file.write_text(content, encoding="utf-8")
+            print(f"  wrote class: {class_file}")
+
+        # Generate __init__.py for this category.
+        cat_package = _dir_to_package(cat_dir)
+        init_content = _render_category_init(entries, cat_package)
+        (cat_dir / "__init__.py").write_text(init_content, encoding="utf-8")
+        print(f"  wrote init:  {cat_dir / '__init__.py'}")
+
+    print(f"\ntotal objects: {len(dep_graph)}, total classes: {len(all_class_names)}")
 
 
 if __name__ == "__main__":
