@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'agent'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -28,7 +28,9 @@ def get_agent_schema() -> pa.Schema:
         [
             pa.field("name", pa.string(), nullable=True),
             pa.field(
-                "policies", pa.list_(pa.struct(list(POLICY_SCHEMA))), nullable=True
+                "policies",
+                pa.list_(pa.struct(list(POLICY_SCHEMA))),
+                nullable=True,
             ),
             pa.field("type", pa.string(), nullable=True),
             pa.field("type_id", pa.int32(), nullable=True),

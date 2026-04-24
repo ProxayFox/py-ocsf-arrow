@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'authentication'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,8 +19,12 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
 AUTH_FACTOR_SCHEMA = _load_dep("auth_factor").AUTH_FACTOR_SCHEMA
 CERTIFICATE_SCHEMA = _load_dep("certificate").CERTIFICATE_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 HTTP_REQUEST_SCHEMA = _load_dep("http_request").HTTP_REQUEST_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
@@ -39,6 +43,8 @@ def get_authentication_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field(
                 "auth_factors",
                 pa.list_(pa.struct(list(AUTH_FACTOR_SCHEMA))),
@@ -51,9 +57,13 @@ def get_authentication_schema() -> pa.Schema:
             pa.field("certificate", pa.struct(list(CERTIFICATE_SCHEMA)), nullable=True),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -64,7 +74,9 @@ def get_authentication_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field(
-                "http_request", pa.struct(list(HTTP_REQUEST_SCHEMA)), nullable=True
+                "http_request",
+                pa.struct(list(HTTP_REQUEST_SCHEMA)),
+                nullable=True,
             ),
             pa.field("is_cleartext", pa.bool8(), nullable=True),
             pa.field("is_mfa", pa.bool8(), nullable=True),
@@ -86,7 +98,9 @@ def get_authentication_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

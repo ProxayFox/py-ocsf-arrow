@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'job'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util

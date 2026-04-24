@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'network_file_activity'.
 
-Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.0.0.
 """
 
 import importlib.util
@@ -19,6 +19,9 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
@@ -33,10 +36,13 @@ def get_network_file_activity_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=False),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("count", pa.int32(), nullable=True),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -60,7 +66,9 @@ def get_network_file_activity_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=False
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=False,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

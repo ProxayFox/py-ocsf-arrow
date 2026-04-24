@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'user'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -50,6 +50,9 @@ def get_user_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(PROGRAMMATIC_CREDENTIAL_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("risk_level", pa.string(), nullable=True),
+            pa.field("risk_level_id", pa.int32(), nullable=True),
+            pa.field("risk_score", pa.int32(), nullable=True),
             pa.field("type", pa.string(), nullable=True),
             pa.field("type_id", pa.int32(), nullable=True),
             pa.field("uid", pa.string(), nullable=True),

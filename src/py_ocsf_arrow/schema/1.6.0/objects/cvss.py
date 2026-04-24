@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'cvss'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -29,10 +29,13 @@ def get_cvss_schema() -> pa.Schema:
             pa.field("base_score", pa.float32(), nullable=False),
             pa.field("depth", pa.string(), nullable=True),
             pa.field(
-                "metrics", pa.list_(pa.struct(list(METRIC_SCHEMA))), nullable=True
+                "metrics",
+                pa.list_(pa.struct(list(METRIC_SCHEMA))),
+                nullable=True,
             ),
             pa.field("overall_score", pa.float32(), nullable=True),
             pa.field("severity", pa.string(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("vector_string", pa.string(), nullable=True),
             pa.field("vendor_name", pa.string(), nullable=True),
             pa.field("version", pa.string(), nullable=False),

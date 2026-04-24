@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'file'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 DIGITAL_SIGNATURE_SCHEMA = _load_dep("digital_signature").DIGITAL_SIGNATURE_SCHEMA
 FINGERPRINT_SCHEMA = _load_dep("fingerprint").FINGERPRINT_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
@@ -40,9 +41,16 @@ def get_file_schema() -> pa.Schema:
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("creator", pa.struct(list(USER_SCHEMA)), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
             pa.field("desc", pa.string(), nullable=True),
             pa.field(
-                "hashes", pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))), nullable=True
+                "hashes",
+                pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("is_system", pa.bool8(), nullable=True),
             pa.field("mime_type", pa.string(), nullable=True),
@@ -56,7 +64,9 @@ def get_file_schema() -> pa.Schema:
             pa.field("product", pa.struct(list(PRODUCT_SCHEMA)), nullable=True),
             pa.field("security_descriptor", pa.string(), nullable=True),
             pa.field(
-                "signature", pa.struct(list(DIGITAL_SIGNATURE_SCHEMA)), nullable=True
+                "signature",
+                pa.struct(list(DIGITAL_SIGNATURE_SCHEMA)),
+                nullable=True,
             ),
             pa.field("size", pa.int64(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

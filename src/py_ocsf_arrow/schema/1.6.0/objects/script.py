@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'script'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -30,12 +30,16 @@ def get_script_schema() -> pa.Schema:
         [
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=True),
             pa.field(
-                "hashes", pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))), nullable=True
+                "hashes",
+                pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("name", pa.string(), nullable=True),
             pa.field("parent_uid", pa.string(), nullable=True),
             pa.field(
-                "script_content", pa.struct(list(LONG_STRING_SCHEMA)), nullable=False
+                "script_content",
+                pa.struct(list(LONG_STRING_SCHEMA)),
+                nullable=False,
             ),
             pa.field("type", pa.string(), nullable=True),
             pa.field("type_id", pa.int32(), nullable=False),

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'attack'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -31,11 +31,15 @@ def get_attack_schema() -> pa.Schema:
         [
             pa.field("mitigation", pa.struct(list(MITIGATION_SCHEMA)), nullable=True),
             pa.field(
-                "sub_technique", pa.struct(list(SUB_TECHNIQUE_SCHEMA)), nullable=True
+                "sub_technique",
+                pa.struct(list(SUB_TECHNIQUE_SCHEMA)),
+                nullable=True,
             ),
             pa.field("tactic", pa.struct(list(TACTIC_SCHEMA)), nullable=True),
             pa.field(
-                "tactics", pa.list_(pa.struct(list(TACTIC_SCHEMA))), nullable=True
+                "tactics",
+                pa.list_(pa.struct(list(TACTIC_SCHEMA))),
+                nullable=True,
             ),
             pa.field("technique", pa.struct(list(TECHNIQUE_SCHEMA)), nullable=True),
             pa.field("version", pa.string(), nullable=True),

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'network_interface'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -32,7 +32,9 @@ def get_network_interface_schema() -> pa.Schema:
             pa.field("name", pa.string(), nullable=True),
             pa.field("namespace", pa.string(), nullable=True),
             pa.field(
-                "open_ports", pa.list_(pa.struct(list(PORT_INFO_SCHEMA))), nullable=True
+                "open_ports",
+                pa.list_(pa.struct(list(PORT_INFO_SCHEMA))),
+                nullable=True,
             ),
             pa.field("subnet_prefix", pa.int32(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

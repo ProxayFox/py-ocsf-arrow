@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'anomaly_analysis'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -34,10 +34,14 @@ def get_anomaly_analysis_schema() -> pa.Schema:
                 nullable=False,
             ),
             pa.field(
-                "anomalies", pa.list_(pa.struct(list(ANOMALY_SCHEMA))), nullable=False
+                "anomalies",
+                pa.list_(pa.struct(list(ANOMALY_SCHEMA))),
+                nullable=False,
             ),
             pa.field(
-                "baselines", pa.list_(pa.struct(list(BASELINE_SCHEMA))), nullable=True
+                "baselines",
+                pa.list_(pa.struct(list(BASELINE_SCHEMA))),
+                nullable=True,
             ),
         ]
     )

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'product'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 FEATURE_SCHEMA = _load_dep("feature").FEATURE_SCHEMA
 
 
@@ -27,6 +28,16 @@ def get_product_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field("cpe_name", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("feature", pa.struct(list(FEATURE_SCHEMA)), nullable=True),
             pa.field("lang", pa.string(), nullable=True),
             pa.field("name", pa.string(), nullable=True),

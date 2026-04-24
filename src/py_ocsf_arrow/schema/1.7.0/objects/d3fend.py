@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'd3fend'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -29,7 +29,9 @@ def get_d3fend_schema() -> pa.Schema:
         [
             pa.field("d3f_tactic", pa.struct(list(D3F_TACTIC_SCHEMA)), nullable=True),
             pa.field(
-                "d3f_technique", pa.struct(list(D3F_TECHNIQUE_SCHEMA)), nullable=True
+                "d3f_technique",
+                pa.struct(list(D3F_TECHNIQUE_SCHEMA)),
+                nullable=True,
             ),
             pa.field("version", pa.string(), nullable=True),
         ]

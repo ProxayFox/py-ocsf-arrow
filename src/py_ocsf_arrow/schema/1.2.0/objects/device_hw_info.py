@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'device_hw_info'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -38,7 +38,9 @@ def get_device_hw_info_schema() -> pa.Schema:
             pa.field("cpu_type", pa.string(), nullable=True),
             pa.field("desktop_display", pa.struct(list(DISPLAY_SCHEMA)), nullable=True),
             pa.field(
-                "keyboard_info", pa.struct(list(KEYBOARD_INFO_SCHEMA)), nullable=True
+                "keyboard_info",
+                pa.struct(list(KEYBOARD_INFO_SCHEMA)),
+                nullable=True,
             ),
             pa.field("ram_size", pa.int32(), nullable=True),
             pa.field("serial_number", pa.string(), nullable=True),

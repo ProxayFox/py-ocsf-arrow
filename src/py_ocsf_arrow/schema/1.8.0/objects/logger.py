@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'logger'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 PRODUCT_SCHEMA = _load_dep("product").PRODUCT_SCHEMA
 
 
@@ -26,6 +27,7 @@ def get_logger_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF object 'logger'."""
     return pa.schema(
         [
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field("event_uid", pa.string(), nullable=True),
             pa.field("is_truncated", pa.bool8(), nullable=True),
             pa.field("log_format", pa.string(), nullable=True),

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'resource_details'.
 
-Generated from version 1.1.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.1.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 USER_SCHEMA = _load_dep("user").USER_SCHEMA
 
 
@@ -29,6 +30,7 @@ def get_resource_details_schema() -> pa.Schema:
             pa.field("cloud_partition", pa.string(), nullable=True),
             pa.field("criticality", pa.string(), nullable=True),
             pa.field("data", pa.string(), nullable=True),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("labels", pa.list_(pa.string()), nullable=True),
             pa.field("name", pa.string(), nullable=True),
             pa.field("namespace", pa.string(), nullable=True),

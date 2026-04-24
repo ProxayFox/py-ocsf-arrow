@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'load_balancer'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -31,7 +31,9 @@ def get_load_balancer_schema() -> pa.Schema:
             pa.field("classification", pa.string(), nullable=True),
             pa.field("code", pa.int32(), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field(
                 "endpoint_connections",
@@ -42,7 +44,9 @@ def get_load_balancer_schema() -> pa.Schema:
             pa.field("ip", pa.string(), nullable=True),
             pa.field("message", pa.string(), nullable=True),
             pa.field(
-                "metrics", pa.list_(pa.struct(list(METRIC_SCHEMA))), nullable=True
+                "metrics",
+                pa.list_(pa.struct(list(METRIC_SCHEMA))),
+                nullable=True,
             ),
             pa.field("name", pa.string(), nullable=True),
             pa.field("status_detail", pa.string(), nullable=True),

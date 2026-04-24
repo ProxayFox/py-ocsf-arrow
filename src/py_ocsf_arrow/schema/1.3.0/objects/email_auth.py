@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'email_auth'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import pyarrow as pa

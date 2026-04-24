@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'osint'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 AUTONOMOUS_SYSTEM_SCHEMA = _load_dep("autonomous_system").AUTONOMOUS_SYSTEM_SCHEMA
 DIGITAL_SIGNATURE_SCHEMA = _load_dep("digital_signature").DIGITAL_SIGNATURE_SCHEMA
 DNS_ANSWER_SCHEMA = _load_dep("dns_answer").DNS_ANSWER_SCHEMA
@@ -35,7 +36,14 @@ def get_osint_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "answers", pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))), nullable=True
+                "answers",
+                pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
             ),
             pa.field(
                 "autonomous_system",

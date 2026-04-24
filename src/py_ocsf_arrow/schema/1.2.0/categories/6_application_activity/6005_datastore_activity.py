@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'datastore_activity'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,10 +19,17 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
+AUTHORIZATION_SCHEMA = _load_dep("authorization").AUTHORIZATION_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
 DATABASE_SCHEMA = _load_dep("database").DATABASE_SCHEMA
 DATABUCKET_SCHEMA = _load_dep("databucket").DATABUCKET_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
+FIREWALL_RULE_SCHEMA = _load_dep("firewall_rule").FIREWALL_RULE_SCHEMA
 HTTP_REQUEST_SCHEMA = _load_dep("http_request").HTTP_REQUEST_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 NETWORK_ENDPOINT_SCHEMA = _load_dep("network_endpoint").NETWORK_ENDPOINT_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
@@ -35,17 +42,36 @@ def get_datastore_activity_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF class 'datastore_activity'."""
     return pa.schema(
         [
+            pa.field("action", pa.string(), nullable=True),
+            pa.field("action_id", pa.int32(), nullable=False),
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=False),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "authorizations",
+                pa.list_(pa.struct(list(AUTHORIZATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("count", pa.int32(), nullable=True),
             pa.field("database", pa.struct(list(DATABASE_SCHEMA)), nullable=True),
             pa.field("databucket", pa.struct(list(DATABUCKET_SCHEMA)), nullable=True),
+            pa.field("disposition", pa.string(), nullable=True),
+            pa.field("disposition_id", pa.int32(), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -56,7 +82,19 @@ def get_datastore_activity_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field(
-                "http_request", pa.struct(list(HTTP_REQUEST_SCHEMA)), nullable=True
+                "firewall_rule",
+                pa.struct(list(FIREWALL_RULE_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "http_request",
+                pa.struct(list(HTTP_REQUEST_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
             ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
@@ -70,7 +108,9 @@ def get_datastore_activity_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=False
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=False,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

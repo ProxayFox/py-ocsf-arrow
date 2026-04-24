@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'metadata'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 EXTENSION_SCHEMA = _load_dep("extension").EXTENSION_SCHEMA
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
 LOGGER_SCHEMA = _load_dep("logger").LOGGER_SCHEMA
@@ -32,11 +33,23 @@ def get_metadata_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field("correlation_uid", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("debug", pa.list_(pa.string()), nullable=True),
             pa.field("event_code", pa.string(), nullable=True),
             pa.field("extension", pa.struct(list(EXTENSION_SCHEMA)), nullable=True),
             pa.field(
-                "extensions", pa.list_(pa.struct(list(EXTENSION_SCHEMA))), nullable=True
+                "extensions",
+                pa.list_(pa.struct(list(EXTENSION_SCHEMA))),
+                nullable=True,
             ),
             pa.field("is_truncated", pa.bool8(), nullable=True),
             pa.field("labels", pa.list_(pa.string()), nullable=True),
@@ -49,7 +62,9 @@ def get_metadata_schema() -> pa.Schema:
             pa.field("logged_time", pa.int64(), nullable=True),
             pa.field("logged_time_dt", pa.string(), nullable=True),
             pa.field(
-                "loggers", pa.list_(pa.struct(list(LOGGER_SCHEMA))), nullable=True
+                "loggers",
+                pa.list_(pa.struct(list(LOGGER_SCHEMA))),
+                nullable=True,
             ),
             pa.field("modified_time", pa.int64(), nullable=True),
             pa.field("modified_time_dt", pa.string(), nullable=True),

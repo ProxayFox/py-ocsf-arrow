@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'application'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 GRAPH_SCHEMA = _load_dep("graph").GRAPH_SCHEMA
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
 SBOM_SCHEMA = _load_dep("sbom").SBOM_SCHEMA
 URL_SCHEMA = _load_dep("url").URL_SCHEMA
@@ -33,14 +34,20 @@ def get_application_schema() -> pa.Schema:
             pa.field("criticality", pa.string(), nullable=True),
             pa.field("data", pa.string(), nullable=True),
             pa.field("desc", pa.string(), nullable=True),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("hostname", pa.string(), nullable=True),
             pa.field("labels", pa.list_(pa.string()), nullable=True),
             pa.field("name", pa.string(), nullable=True),
             pa.field("owner", pa.struct(list(USER_SCHEMA)), nullable=True),
             pa.field("region", pa.string(), nullable=True),
             pa.field(
-                "resource_relationship", pa.struct(list(GRAPH_SCHEMA)), nullable=True
+                "resource_relationship",
+                pa.struct(list(GRAPH_SCHEMA)),
+                nullable=True,
             ),
+            pa.field("risk_level", pa.string(), nullable=True),
+            pa.field("risk_level_id", pa.int32(), nullable=True),
+            pa.field("risk_score", pa.int32(), nullable=True),
             pa.field("sbom", pa.struct(list(SBOM_SCHEMA)), nullable=True),
             pa.field(
                 "tags",

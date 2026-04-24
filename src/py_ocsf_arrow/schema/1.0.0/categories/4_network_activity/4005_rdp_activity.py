@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'rdp_activity'.
 
-Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.0.0.
 """
 
 import importlib.util
@@ -19,8 +19,14 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 DISPLAY_SCHEMA = _load_dep("display").DISPLAY_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 NETWORK_CONNECTION_INFO_SCHEMA = _load_dep(
     "network_connection_info"
@@ -41,21 +47,34 @@ def get_rdp_activity_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("app_name", pa.string(), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("capabilities", pa.list_(pa.string()), nullable=True),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("certificate_chain", pa.list_(pa.string()), nullable=True),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field(
                 "connection_info",
                 pa.struct(list(NETWORK_CONNECTION_INFO_SCHEMA)),
                 nullable=True,
             ),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
+            pa.field("disposition", pa.string(), nullable=True),
+            pa.field("disposition_id", pa.int32(), nullable=False),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=False
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=False,
             ),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -66,6 +85,11 @@ def get_rdp_activity_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("identifier_cookie", pa.string(), nullable=True),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
             pa.field(
@@ -82,7 +106,9 @@ def get_rdp_activity_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=False
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=False,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

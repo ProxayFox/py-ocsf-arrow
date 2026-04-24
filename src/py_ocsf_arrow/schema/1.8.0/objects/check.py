@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'check'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -29,7 +29,9 @@ def get_check_schema() -> pa.Schema:
             pa.field("desc", pa.string(), nullable=True),
             pa.field("name", pa.string(), nullable=True),
             pa.field(
-                "resource", pa.struct(list(RESOURCE_DETAILS_SCHEMA)), nullable=True
+                "resource",
+                pa.struct(list(RESOURCE_DETAILS_SCHEMA)),
+                nullable=True,
             ),
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=True),

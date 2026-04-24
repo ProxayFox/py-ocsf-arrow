@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'process_remediation_activity'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -19,11 +19,16 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
 D3FEND_SCHEMA = _load_dep("d3fend").D3FEND_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
+OSINT_SCHEMA = _load_dep("osint").OSINT_SCHEMA
 PROCESS_SCHEMA = _load_dep("process").PROCESS_SCHEMA
 REMEDIATION_SCHEMA = _load_dep("remediation").REMEDIATION_SCHEMA
 SCAN_SCHEMA = _load_dep("scan").SCAN_SCHEMA
@@ -35,10 +40,13 @@ def get_process_remediation_activity_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("command_uid", pa.string(), nullable=False),
             pa.field("count", pa.int32(), nullable=True),
             pa.field(
@@ -46,6 +54,7 @@ def get_process_remediation_activity_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(D3FEND_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field("duration", pa.int64(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
             pa.field("end_time_dt", pa.string(), nullable=True),
@@ -61,6 +70,7 @@ def get_process_remediation_activity_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(OBSERVABLE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("osint", pa.list_(pa.struct(list(OSINT_SCHEMA))), nullable=False),
             pa.field("process", pa.struct(list(PROCESS_SCHEMA)), nullable=False),
             pa.field("raw_data", pa.string(), nullable=True),
             pa.field("remediation", pa.struct(list(REMEDIATION_SCHEMA)), nullable=True),

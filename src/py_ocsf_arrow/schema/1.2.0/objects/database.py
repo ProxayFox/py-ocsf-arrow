@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'database'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 
 
@@ -28,6 +29,11 @@ def get_database_schema() -> pa.Schema:
         [
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
             pa.field("desc", pa.string(), nullable=True),
             pa.field("groups", pa.list_(pa.struct(list(GROUP_SCHEMA))), nullable=True),
             pa.field("modified_time", pa.int64(), nullable=True),

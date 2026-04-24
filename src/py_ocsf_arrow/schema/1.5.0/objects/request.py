@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'request'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -27,7 +27,9 @@ def get_request_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "containers", pa.list_(pa.struct(list(CONTAINER_SCHEMA))), nullable=True
+                "containers",
+                pa.list_(pa.struct(list(CONTAINER_SCHEMA))),
+                nullable=True,
             ),
             pa.field("data", pa.string(), nullable=True),
             pa.field("flags", pa.list_(pa.string()), nullable=True),

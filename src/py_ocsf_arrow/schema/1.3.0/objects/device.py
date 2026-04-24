@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'device'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 AGENT_SCHEMA = _load_dep("agent").AGENT_SCHEMA
+CONTAINER_SCHEMA = _load_dep("container").CONTAINER_SCHEMA
 DEVICE_HW_INFO_SCHEMA = _load_dep("device_hw_info").DEVICE_HW_INFO_SCHEMA
 GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 IMAGE_SCHEMA = _load_dep("image").IMAGE_SCHEMA
@@ -35,11 +36,14 @@ def get_device_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "agent_list", pa.list_(pa.struct(list(AGENT_SCHEMA))), nullable=True
+                "agent_list",
+                pa.list_(pa.struct(list(AGENT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("autoscale_uid", pa.string(), nullable=True),
             pa.field("boot_time", pa.int64(), nullable=True),
             pa.field("boot_time_dt", pa.string(), nullable=True),
+            pa.field("container", pa.struct(list(CONTAINER_SCHEMA)), nullable=True),
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("desc", pa.string(), nullable=True),
@@ -67,6 +71,7 @@ def get_device_schema() -> pa.Schema:
             pa.field("modified_time", pa.int64(), nullable=True),
             pa.field("modified_time_dt", pa.string(), nullable=True),
             pa.field("name", pa.string(), nullable=True),
+            pa.field("namespace_pid", pa.int32(), nullable=True),
             pa.field(
                 "network_interfaces",
                 pa.list_(pa.struct(list(NETWORK_INTERFACE_SCHEMA))),

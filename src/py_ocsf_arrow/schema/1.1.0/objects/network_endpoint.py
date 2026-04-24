@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'network_endpoint'.
 
-Generated from version 1.1.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.1.0.
 """
 
 import importlib.util
@@ -19,8 +19,10 @@ def _load_dep(name: str):
     return mod
 
 
+CONTAINER_SCHEMA = _load_dep("container").CONTAINER_SCHEMA
 DEVICE_HW_INFO_SCHEMA = _load_dep("device_hw_info").DEVICE_HW_INFO_SCHEMA
 LOCATION_SCHEMA = _load_dep("location").LOCATION_SCHEMA
+NETWORK_PROXY_SCHEMA = _load_dep("network_proxy").NETWORK_PROXY_SCHEMA
 OS_SCHEMA = _load_dep("os").OS_SCHEMA
 
 
@@ -28,6 +30,7 @@ def get_network_endpoint_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF object 'network_endpoint'."""
     return pa.schema(
         [
+            pa.field("container", pa.struct(list(CONTAINER_SCHEMA)), nullable=True),
             pa.field("domain", pa.string(), nullable=True),
             pa.field("hostname", pa.string(), nullable=True),
             pa.field("hw_info", pa.struct(list(DEVICE_HW_INFO_SCHEMA)), nullable=True),
@@ -39,8 +42,14 @@ def get_network_endpoint_schema() -> pa.Schema:
             pa.field("location", pa.struct(list(LOCATION_SCHEMA)), nullable=True),
             pa.field("mac", pa.string(), nullable=True),
             pa.field("name", pa.string(), nullable=True),
+            pa.field("namespace_pid", pa.int32(), nullable=True),
             pa.field("os", pa.struct(list(OS_SCHEMA)), nullable=True),
             pa.field("port", pa.int32(), nullable=True),
+            pa.field(
+                "proxy_endpoint",
+                pa.struct(list(NETWORK_PROXY_SCHEMA)),
+                nullable=True,
+            ),
             pa.field("subnet_uid", pa.string(), nullable=True),
             pa.field("svc_name", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

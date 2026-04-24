@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'query_evidence'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 JOB_SCHEMA = _load_dep("job").JOB_SCHEMA
 KERNEL_SCHEMA = _load_dep("kernel").KERNEL_SCHEMA
 MODULE_SCHEMA = _load_dep("module").MODULE_SCHEMA
@@ -46,6 +47,7 @@ def get_query_evidence_schema() -> pa.Schema:
             ),
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=True),
             pa.field("folder", pa.struct(list(FILE_SCHEMA)), nullable=True),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("job", pa.struct(list(JOB_SCHEMA)), nullable=True),
             pa.field("kernel", pa.struct(list(KERNEL_SCHEMA)), nullable=True),
             pa.field("module", pa.struct(list(MODULE_SCHEMA)), nullable=True),
@@ -67,7 +69,9 @@ def get_query_evidence_schema() -> pa.Schema:
             pa.field("service", pa.struct(list(SERVICE_SCHEMA)), nullable=True),
             pa.field("session", pa.struct(list(SESSION_SCHEMA)), nullable=True),
             pa.field(
-                "startup_item", pa.struct(list(STARTUP_ITEM_SCHEMA)), nullable=True
+                "startup_item",
+                pa.struct(list(STARTUP_ITEM_SCHEMA)),
+                nullable=True,
             ),
             pa.field("state", pa.string(), nullable=True),
             pa.field("tcp_state_id", pa.int32(), nullable=True),

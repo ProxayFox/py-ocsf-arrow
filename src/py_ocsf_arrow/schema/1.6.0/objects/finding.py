@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'finding'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -45,6 +45,7 @@ def get_finding_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("remediation", pa.struct(list(REMEDIATION_SCHEMA)), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("supporting_data", pa.string(), nullable=True),
             pa.field("title", pa.string(), nullable=False),
             pa.field("types", pa.list_(pa.string()), nullable=True),

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'fingerprint'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import pyarrow as pa

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'api'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 REQUEST_SCHEMA = _load_dep("request").REQUEST_SCHEMA
 RESPONSE_SCHEMA = _load_dep("response").RESPONSE_SCHEMA
 SERVICE_SCHEMA = _load_dep("service").SERVICE_SCHEMA
@@ -28,6 +29,7 @@ def get_api_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF object 'api'."""
     return pa.schema(
         [
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("operation", pa.string(), nullable=False),
             pa.field("request", pa.struct(list(REQUEST_SCHEMA)), nullable=True),
             pa.field("response", pa.struct(list(RESPONSE_SCHEMA)), nullable=True),

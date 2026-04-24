@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'enrichment'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import importlib.util
@@ -34,6 +34,7 @@ def get_enrichment_schema() -> pa.Schema:
             pa.field("provider", pa.string(), nullable=True),
             pa.field("reputation", pa.struct(list(REPUTATION_SCHEMA)), nullable=True),
             pa.field("short_desc", pa.string(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),
             pa.field("value", pa.string(), nullable=False),
         ]

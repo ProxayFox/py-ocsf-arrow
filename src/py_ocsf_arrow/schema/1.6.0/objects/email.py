@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'email'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
 HTTP_HEADER_SCHEMA = _load_dep("http_header").HTTP_HEADER_SCHEMA
 URL_SCHEMA = _load_dep("url").URL_SCHEMA
@@ -30,6 +31,16 @@ def get_email_schema() -> pa.Schema:
         [
             pa.field("cc", pa.list_(pa.string()), nullable=True),
             pa.field("cc_mailboxes", pa.list_(pa.string()), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("delivered_to", pa.string(), nullable=True),
             pa.field("delivered_to_list", pa.list_(pa.string()), nullable=True),
             pa.field("files", pa.list_(pa.struct(list(FILE_SCHEMA))), nullable=True),

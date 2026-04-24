@@ -1,0 +1,35 @@
+{
+  "extension_profiles": {
+    "linux": [
+      "linux/linux_users"
+    ],
+    "win": []
+  },
+  "profiles": {
+    "cloud": [
+      "api",
+      "cloud"
+    ],
+    "container": [
+      "container",
+      "namespace_pid"
+    ],
+    "datetime": [],
+    "host": [
+      "actor",
+      "device"
+    ],
+    "linux/linux_users": [
+      "auid",
+      "egid",
+      "euid",
+      "group"
+    ],
+    "security_control": [
+      "attacks",
+      "disposition",
+      "disposition_id",
+      "malware"
+    ]
+  }
+}

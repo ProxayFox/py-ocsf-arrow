@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'web_resource'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
 
 
@@ -29,6 +30,16 @@ def get_web_resource_schema() -> pa.Schema:
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("data", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("desc", pa.string(), nullable=True),
             pa.field("labels", pa.list_(pa.string()), nullable=True),
             pa.field("modified_time", pa.int64(), nullable=True),

@@ -1,9 +1,25 @@
 """Auto-generated Arrow schema for OCSF object 'email'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
+import importlib.util
+from pathlib import Path
+
 import pyarrow as pa
+
+_OBJECTS_DIR = Path(__file__).parent
+
+
+def _load_dep(name: str):
+    spec = importlib.util.spec_from_file_location(name, _OBJECTS_DIR / f"{name}.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 
 
 def get_email_schema() -> pa.Schema:
@@ -11,6 +27,11 @@ def get_email_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field("cc", pa.list_(pa.string()), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
             pa.field("delivered_to", pa.string(), nullable=True),
             pa.field("from", pa.string(), nullable=False),
             pa.field("message_uid", pa.string(), nullable=True),

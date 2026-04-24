@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'kb_article'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import importlib.util
@@ -40,6 +40,7 @@ def get_kb_article_schema() -> pa.Schema:
             pa.field("product", pa.struct(list(PRODUCT_SCHEMA)), nullable=True),
             pa.field("severity", pa.string(), nullable=True),
             pa.field("size", pa.int64(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("title", pa.string(), nullable=True),
             pa.field("uid", pa.string(), nullable=False),
         ]

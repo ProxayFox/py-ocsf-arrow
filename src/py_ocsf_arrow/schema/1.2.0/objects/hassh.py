@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'hassh'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -28,7 +28,9 @@ def get_hassh_schema() -> pa.Schema:
         [
             pa.field("algorithm", pa.string(), nullable=True),
             pa.field(
-                "fingerprint", pa.struct(list(FINGERPRINT_SCHEMA)), nullable=False
+                "fingerprint",
+                pa.struct(list(FINGERPRINT_SCHEMA)),
+                nullable=False,
             ),
         ]
     )

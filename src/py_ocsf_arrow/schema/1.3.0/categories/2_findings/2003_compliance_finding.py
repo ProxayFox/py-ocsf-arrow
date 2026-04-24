@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'compliance_finding'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -19,12 +19,17 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
 COMPLIANCE_SCHEMA = _load_dep("compliance").COMPLIANCE_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 FINDING_INFO_SCHEMA = _load_dep("finding_info").FINDING_INFO_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
+OSINT_SCHEMA = _load_dep("osint").OSINT_SCHEMA
 REMEDIATION_SCHEMA = _load_dep("remediation").REMEDIATION_SCHEMA
 RESOURCE_DETAILS_SCHEMA = _load_dep("resource_details").RESOURCE_DETAILS_SCHEMA
 
@@ -35,16 +40,20 @@ def get_compliance_finding_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("comment", pa.string(), nullable=True),
             pa.field("compliance", pa.struct(list(COMPLIANCE_SCHEMA)), nullable=False),
             pa.field("confidence", pa.string(), nullable=True),
             pa.field("confidence_id", pa.int32(), nullable=True),
             pa.field("confidence_score", pa.int32(), nullable=True),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field("duration", pa.int64(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
             pa.field("end_time_dt", pa.string(), nullable=True),
@@ -54,7 +63,9 @@ def get_compliance_finding_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field(
-                "finding_info", pa.struct(list(FINDING_INFO_SCHEMA)), nullable=False
+                "finding_info",
+                pa.struct(list(FINDING_INFO_SCHEMA)),
+                nullable=False,
             ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
@@ -63,10 +74,13 @@ def get_compliance_finding_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(OBSERVABLE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("osint", pa.list_(pa.struct(list(OSINT_SCHEMA))), nullable=False),
             pa.field("raw_data", pa.string(), nullable=True),
             pa.field("remediation", pa.struct(list(REMEDIATION_SCHEMA)), nullable=True),
             pa.field(
-                "resource", pa.struct(list(RESOURCE_DETAILS_SCHEMA)), nullable=True
+                "resource",
+                pa.struct(list(RESOURCE_DETAILS_SCHEMA)),
+                nullable=True,
             ),
             pa.field(
                 "resources",

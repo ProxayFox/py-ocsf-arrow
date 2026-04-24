@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'unmanned_system_operating_area'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -45,7 +45,9 @@ def get_unmanned_system_operating_area_schema() -> pa.Schema:
             pa.field("isp", pa.string(), nullable=True),
             pa.field("lat", pa.float32(), nullable=True),
             pa.field(
-                "locations", pa.list_(pa.struct(list(LOCATION_SCHEMA))), nullable=True
+                "locations",
+                pa.list_(pa.struct(list(LOCATION_SCHEMA))),
+                nullable=True,
             ),
             pa.field("long", pa.float32(), nullable=True),
             pa.field("postal_code", pa.string(), nullable=True),

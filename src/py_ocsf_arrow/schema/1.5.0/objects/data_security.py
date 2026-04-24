@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'data_security'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -21,6 +21,7 @@ def _load_dep(name: str):
 
 CLASSIFIER_DETAILS_SCHEMA = _load_dep("classifier_details").CLASSIFIER_DETAILS_SCHEMA
 DISCOVERY_DETAILS_SCHEMA = _load_dep("discovery_details").DISCOVERY_DETAILS_SCHEMA
+POLICY_SCHEMA = _load_dep("policy").POLICY_SCHEMA
 
 
 def get_data_security_schema() -> pa.Schema:
@@ -47,7 +48,9 @@ def get_data_security_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("pattern_match", pa.string(), nullable=True),
+            pa.field("policy", pa.struct(list(POLICY_SCHEMA)), nullable=True),
             pa.field("size", pa.int64(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("status", pa.string(), nullable=True),
             pa.field("status_details", pa.list_(pa.string()), nullable=True),
             pa.field("status_id", pa.int32(), nullable=True),

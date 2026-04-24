@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'kill_chain_phase'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import pyarrow as pa

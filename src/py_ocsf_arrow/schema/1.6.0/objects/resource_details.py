@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'resource_details'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -20,7 +20,9 @@ def _load_dep(name: str):
 
 
 AGENT_SCHEMA = _load_dep("agent").AGENT_SCHEMA
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 GRAPH_SCHEMA = _load_dep("graph").GRAPH_SCHEMA
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
 USER_SCHEMA = _load_dep("user").USER_SCHEMA
 
@@ -30,13 +32,26 @@ def get_resource_details_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "agent_list", pa.list_(pa.struct(list(AGENT_SCHEMA))), nullable=True
+                "agent_list",
+                pa.list_(pa.struct(list(AGENT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("cloud_partition", pa.string(), nullable=True),
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("criticality", pa.string(), nullable=True),
             pa.field("data", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("hostname", pa.string(), nullable=True),
             pa.field("ip", pa.string(), nullable=True),
             pa.field("is_backed_up", pa.bool8(), nullable=True),
@@ -48,7 +63,9 @@ def get_resource_details_schema() -> pa.Schema:
             pa.field("owner", pa.struct(list(USER_SCHEMA)), nullable=True),
             pa.field("region", pa.string(), nullable=True),
             pa.field(
-                "resource_relationship", pa.struct(list(GRAPH_SCHEMA)), nullable=True
+                "resource_relationship",
+                pa.struct(list(GRAPH_SCHEMA)),
+                nullable=True,
             ),
             pa.field("role", pa.string(), nullable=True),
             pa.field("role_id", pa.int32(), nullable=True),

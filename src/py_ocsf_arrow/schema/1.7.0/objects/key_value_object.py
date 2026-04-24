@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'key_value_object'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import pyarrow as pa

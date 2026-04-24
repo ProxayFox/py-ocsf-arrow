@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'managed_entity'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -19,7 +19,9 @@ def _load_dep(name: str):
     return mod
 
 
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 EMAIL_SCHEMA = _load_dep("email").EMAIL_SCHEMA
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 ORGANIZATION_SCHEMA = _load_dep("organization").ORGANIZATION_SCHEMA
 POLICY_SCHEMA = _load_dep("policy").POLICY_SCHEMA
 USER_SCHEMA = _load_dep("user").USER_SCHEMA
@@ -30,7 +32,9 @@ def get_managed_entity_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field("data", pa.string(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field("email", pa.struct(list(EMAIL_SCHEMA)), nullable=True),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("name", pa.string(), nullable=True),
             pa.field("org", pa.struct(list(ORGANIZATION_SCHEMA)), nullable=True),
             pa.field("policy", pa.struct(list(POLICY_SCHEMA)), nullable=True),

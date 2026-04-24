@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'related_event'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 KILL_CHAIN_PHASE_SCHEMA = _load_dep("kill_chain_phase").KILL_CHAIN_PHASE_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
 
@@ -27,6 +28,11 @@ def get_related_event_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF object 'related_event'."""
     return pa.schema(
         [
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
             pa.field(
                 "kill_chain",
                 pa.list_(pa.struct(list(KILL_CHAIN_PHASE_SCHEMA))),

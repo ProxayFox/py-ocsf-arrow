@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'authorize_session'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,7 +19,12 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
+GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
 HTTP_REQUEST_SCHEMA = _load_dep("http_request").HTTP_REQUEST_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 NETWORK_ENDPOINT_SCHEMA = _load_dep("network_endpoint").NETWORK_ENDPOINT_SCHEMA
@@ -35,13 +40,19 @@ def get_authorize_session_schema() -> pa.Schema:
         [
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -51,8 +62,11 @@ def get_authorize_session_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(ENRICHMENT_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field(
-                "http_request", pa.struct(list(HTTP_REQUEST_SCHEMA)), nullable=True
+                "http_request",
+                pa.struct(list(HTTP_REQUEST_SCHEMA)),
+                nullable=True,
             ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
@@ -67,7 +81,9 @@ def get_authorize_session_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'finding_info'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 ANALYTIC_SCHEMA = _load_dep("analytic").ANALYTIC_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
 KILL_CHAIN_PHASE_SCHEMA = _load_dep("kill_chain_phase").KILL_CHAIN_PHASE_SCHEMA
 PRODUCT_SCHEMA = _load_dep("product").PRODUCT_SCHEMA
@@ -32,6 +33,11 @@ def get_finding_info_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field("analytic", pa.struct(list(ANALYTIC_SCHEMA)), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("data_sources", pa.list_(pa.string()), nullable=True),
@@ -60,6 +66,7 @@ def get_finding_info_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("related_events_count", pa.int32(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field(
                 "tags",
                 pa.list_(pa.struct(list(KEY_VALUE_OBJECT_SCHEMA))),

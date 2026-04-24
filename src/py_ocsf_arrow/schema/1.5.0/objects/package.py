@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'package'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -37,6 +37,7 @@ def get_package_schema() -> pa.Schema:
             pa.field("package_manager_url", pa.string(), nullable=True),
             pa.field("purl", pa.string(), nullable=True),
             pa.field("release", pa.string(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),
             pa.field("type_id", pa.int32(), nullable=True),
             pa.field("uid", pa.string(), nullable=True),

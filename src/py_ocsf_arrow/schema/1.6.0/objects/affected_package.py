@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'affected_package'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -41,6 +41,7 @@ def get_affected_package_schema() -> pa.Schema:
             pa.field("purl", pa.string(), nullable=True),
             pa.field("release", pa.string(), nullable=True),
             pa.field("remediation", pa.struct(list(REMEDIATION_SCHEMA)), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),
             pa.field("type_id", pa.int32(), nullable=True),
             pa.field("uid", pa.string(), nullable=True),

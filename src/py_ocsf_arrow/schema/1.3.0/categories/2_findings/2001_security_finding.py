@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'security_finding'.
 
-Generated from version 1.3.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.3.0.
 """
 
 import importlib.util
@@ -20,14 +20,19 @@ def _load_dep(name: str):
 
 
 ANALYTIC_SCHEMA = _load_dep("analytic").ANALYTIC_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 CIS_CSC_SCHEMA = _load_dep("cis_csc").CIS_CSC_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
 COMPLIANCE_SCHEMA = _load_dep("compliance").COMPLIANCE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 FINDING_SCHEMA = _load_dep("finding").FINDING_SCHEMA
 KILL_CHAIN_PHASE_SCHEMA = _load_dep("kill_chain_phase").KILL_CHAIN_PHASE_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
+OSINT_SCHEMA = _load_dep("osint").OSINT_SCHEMA
 PROCESS_SCHEMA = _load_dep("process").PROCESS_SCHEMA
 RESOURCE_DETAILS_SCHEMA = _load_dep("resource_details").RESOURCE_DETAILS_SCHEMA
 VULNERABILITY_SCHEMA = _load_dep("vulnerability").VULNERABILITY_SCHEMA
@@ -40,13 +45,22 @@ def get_security_finding_schema() -> pa.Schema:
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
             pa.field("analytic", pa.struct(list(ANALYTIC_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field(
-                "cis_csc", pa.list_(pa.struct(list(CIS_CSC_SCHEMA))), nullable=True
+                "cis_csc",
+                pa.list_(pa.struct(list(CIS_CSC_SCHEMA))),
+                nullable=True,
             ),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("compliance", pa.struct(list(COMPLIANCE_SCHEMA)), nullable=True),
             pa.field("confidence", pa.string(), nullable=True),
             pa.field("confidence_id", pa.int32(), nullable=True),
@@ -71,6 +85,11 @@ def get_security_finding_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(KILL_CHAIN_PHASE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
             pa.field("nist", pa.list_(pa.string()), nullable=True),
@@ -79,6 +98,7 @@ def get_security_finding_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(OBSERVABLE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("osint", pa.list_(pa.struct(list(OSINT_SCHEMA))), nullable=False),
             pa.field("process", pa.struct(list(PROCESS_SCHEMA)), nullable=True),
             pa.field("raw_data", pa.string(), nullable=True),
             pa.field(

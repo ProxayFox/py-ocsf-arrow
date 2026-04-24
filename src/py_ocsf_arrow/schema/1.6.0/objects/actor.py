@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'actor'.
 
-Generated from version 1.6.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.6.0.
 """
 
 import importlib.util
@@ -19,6 +19,7 @@ def _load_dep(name: str):
     return mod
 
 
+AUTHORIZATION_SCHEMA = _load_dep("authorization").AUTHORIZATION_SCHEMA
 IDP_SCHEMA = _load_dep("idp").IDP_SCHEMA
 PROCESS_SCHEMA = _load_dep("process").PROCESS_SCHEMA
 SESSION_SCHEMA = _load_dep("session").SESSION_SCHEMA
@@ -31,6 +32,11 @@ def get_actor_schema() -> pa.Schema:
         [
             pa.field("app_name", pa.string(), nullable=True),
             pa.field("app_uid", pa.string(), nullable=True),
+            pa.field(
+                "authorizations",
+                pa.list_(pa.struct(list(AUTHORIZATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("idp", pa.struct(list(IDP_SCHEMA)), nullable=True),
             pa.field("invoked_by", pa.string(), nullable=True),
             pa.field("process", pa.struct(list(PROCESS_SCHEMA)), nullable=True),

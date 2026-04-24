@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'permission_analysis_result'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 KEY_VALUE_OBJECT_SCHEMA = _load_dep("key_value_object").KEY_VALUE_OBJECT_SCHEMA
+POLICY_SCHEMA = _load_dep("policy").POLICY_SCHEMA
 SERVICE_PRIVILEGE_ANALYSIS_SCHEMA = _load_dep(
     "service_privilege_analysis"
 ).SERVICE_PRIVILEGE_ANALYSIS_SCHEMA
@@ -36,6 +37,7 @@ def get_permission_analysis_result_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("granted_privileges", pa.list_(pa.string()), nullable=True),
+            pa.field("policy", pa.struct(list(POLICY_SCHEMA)), nullable=True),
             pa.field(
                 "service_privilege_analysis_list",
                 pa.list_(pa.struct(list(SERVICE_PRIVILEGE_ANALYSIS_SCHEMA))),

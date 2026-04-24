@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'osint'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 ANALYTIC_SCHEMA = _load_dep("analytic").ANALYTIC_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 AUTONOMOUS_SYSTEM_SCHEMA = _load_dep("autonomous_system").AUTONOMOUS_SYSTEM_SCHEMA
 DIGITAL_SIGNATURE_SCHEMA = _load_dep("digital_signature").DIGITAL_SIGNATURE_SCHEMA
 DNS_ANSWER_SCHEMA = _load_dep("dns_answer").DNS_ANSWER_SCHEMA
@@ -39,7 +40,14 @@ def get_osint_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "answers", pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))), nullable=True
+                "answers",
+                pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
             ),
             pa.field(
                 "autonomous_system",
@@ -47,6 +55,8 @@ def get_osint_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("comment", pa.string(), nullable=True),
+            pa.field("confidence", pa.string(), nullable=True),
+            pa.field("confidence_id", pa.int32(), nullable=True),
             pa.field("email", pa.struct(list(EMAIL_SCHEMA)), nullable=True),
             pa.field("email_auth", pa.struct(list(EMAIL_AUTH_SCHEMA)), nullable=True),
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=True),
@@ -69,6 +79,7 @@ def get_osint_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(DIGITAL_SIGNATURE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("subdomains", pa.list_(pa.string()), nullable=True),
             pa.field("subnet", pa.string(), nullable=True),
             pa.field("tlp", pa.string(), nullable=True),

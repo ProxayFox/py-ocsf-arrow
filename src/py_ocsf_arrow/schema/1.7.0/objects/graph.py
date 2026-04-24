@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'graph'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util

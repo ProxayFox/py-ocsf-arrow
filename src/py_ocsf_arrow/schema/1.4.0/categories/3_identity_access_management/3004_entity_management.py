@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'entity_management'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import importlib.util
@@ -19,14 +19,24 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
+AUTHORIZATION_SCHEMA = _load_dep("authorization").AUTHORIZATION_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
+FIREWALL_RULE_SCHEMA = _load_dep("firewall_rule").FIREWALL_RULE_SCHEMA
 HTTP_REQUEST_SCHEMA = _load_dep("http_request").HTTP_REQUEST_SCHEMA
 HTTP_RESPONSE_SCHEMA = _load_dep("http_response").HTTP_RESPONSE_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 MANAGED_ENTITY_SCHEMA = _load_dep("managed_entity").MANAGED_ENTITY_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 NETWORK_ENDPOINT_SCHEMA = _load_dep("network_endpoint").NETWORK_ENDPOINT_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
+OSINT_SCHEMA = _load_dep("osint").OSINT_SCHEMA
+POLICY_SCHEMA = _load_dep("policy").POLICY_SCHEMA
 
 
 def get_entity_management_schema() -> pa.Schema:
@@ -35,14 +45,35 @@ def get_entity_management_schema() -> pa.Schema:
         [
             pa.field("access_list", pa.list_(pa.string()), nullable=True),
             pa.field("access_mask", pa.int32(), nullable=True),
+            pa.field("action", pa.string(), nullable=True),
+            pa.field("action_id", pa.int32(), nullable=True),
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "authorizations",
+                pa.list_(pa.struct(list(AUTHORIZATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("comment", pa.string(), nullable=True),
+            pa.field("confidence", pa.string(), nullable=True),
+            pa.field("confidence_id", pa.int32(), nullable=True),
+            pa.field("confidence_score", pa.int32(), nullable=True),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
+            pa.field("disposition", pa.string(), nullable=True),
+            pa.field("disposition_id", pa.int32(), nullable=True),
             pa.field("duration", pa.int64(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
             pa.field("end_time_dt", pa.string(), nullable=True),
@@ -53,13 +84,30 @@ def get_entity_management_schema() -> pa.Schema:
             ),
             pa.field("entity", pa.struct(list(MANAGED_ENTITY_SCHEMA)), nullable=False),
             pa.field(
-                "entity_result", pa.struct(list(MANAGED_ENTITY_SCHEMA)), nullable=True
+                "entity_result",
+                pa.struct(list(MANAGED_ENTITY_SCHEMA)),
+                nullable=True,
             ),
             pa.field(
-                "http_request", pa.struct(list(HTTP_REQUEST_SCHEMA)), nullable=True
+                "firewall_rule",
+                pa.struct(list(FIREWALL_RULE_SCHEMA)),
+                nullable=True,
             ),
             pa.field(
-                "http_response", pa.struct(list(HTTP_RESPONSE_SCHEMA)), nullable=True
+                "http_request",
+                pa.struct(list(HTTP_REQUEST_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "http_response",
+                pa.struct(list(HTTP_RESPONSE_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field("is_alert", pa.bool8(), nullable=True),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
             ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
@@ -68,11 +116,19 @@ def get_entity_management_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(OBSERVABLE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("osint", pa.list_(pa.struct(list(OSINT_SCHEMA))), nullable=False),
+            pa.field("policy", pa.struct(list(POLICY_SCHEMA)), nullable=True),
             pa.field("raw_data", pa.string(), nullable=True),
+            pa.field("risk_details", pa.string(), nullable=True),
+            pa.field("risk_level", pa.string(), nullable=True),
+            pa.field("risk_level_id", pa.int32(), nullable=True),
+            pa.field("risk_score", pa.int32(), nullable=True),
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),

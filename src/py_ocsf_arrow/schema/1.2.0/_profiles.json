@@ -1,0 +1,53 @@
+{
+  "extension_profiles": {
+    "linux": [
+      "linux/linux_users"
+    ],
+    "win": []
+  },
+  "profiles": {
+    "cloud": [
+      "api",
+      "cloud"
+    ],
+    "container": [
+      "container",
+      "namespace_pid"
+    ],
+    "data_classification": [
+      "data_classification"
+    ],
+    "datetime": [],
+    "host": [
+      "actor",
+      "device"
+    ],
+    "linux/linux_users": [
+      "auid",
+      "egid",
+      "euid",
+      "group"
+    ],
+    "load_balancer": [
+      "load_balancer"
+    ],
+    "network_proxy": [
+      "proxy_connection_info",
+      "proxy_endpoint",
+      "proxy_http_request",
+      "proxy_http_response",
+      "proxy_tls",
+      "proxy_traffic"
+    ],
+    "security_control": [
+      "action",
+      "action_id",
+      "attacks",
+      "authorizations",
+      "disposition",
+      "disposition_id",
+      "firewall_rule",
+      "malware"
+    ]
+  }
+}

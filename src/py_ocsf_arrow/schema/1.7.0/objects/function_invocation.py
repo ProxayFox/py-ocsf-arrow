@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'function_invocation'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -28,7 +28,9 @@ def get_function_invocation_schema() -> pa.Schema:
         [
             pa.field("error", pa.string(), nullable=True),
             pa.field(
-                "parameters", pa.list_(pa.struct(list(PARAMETER_SCHEMA))), nullable=True
+                "parameters",
+                pa.list_(pa.struct(list(PARAMETER_SCHEMA))),
+                nullable=True,
             ),
             pa.field("return_value", pa.string(), nullable=True),
         ]

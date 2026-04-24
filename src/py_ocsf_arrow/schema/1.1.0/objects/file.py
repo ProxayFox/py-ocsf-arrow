@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'file'.
 
-Generated from version 1.1.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.1.0.
 """
 
 import importlib.util
@@ -42,7 +42,9 @@ def get_file_schema() -> pa.Schema:
             pa.field("creator", pa.struct(list(USER_SCHEMA)), nullable=True),
             pa.field("desc", pa.string(), nullable=True),
             pa.field(
-                "hashes", pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))), nullable=True
+                "hashes",
+                pa.list_(pa.struct(list(FINGERPRINT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("is_system", pa.bool8(), nullable=True),
             pa.field("mime_type", pa.string(), nullable=True),
@@ -56,7 +58,9 @@ def get_file_schema() -> pa.Schema:
             pa.field("product", pa.struct(list(PRODUCT_SCHEMA)), nullable=True),
             pa.field("security_descriptor", pa.string(), nullable=True),
             pa.field(
-                "signature", pa.struct(list(DIGITAL_SIGNATURE_SCHEMA)), nullable=True
+                "signature",
+                pa.struct(list(DIGITAL_SIGNATURE_SCHEMA)),
+                nullable=True,
             ),
             pa.field("size", pa.int64(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

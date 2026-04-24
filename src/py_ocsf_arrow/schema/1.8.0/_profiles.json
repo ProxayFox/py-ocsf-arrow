@@ -1,0 +1,96 @@
+{
+  "extension_profiles": {
+    "linux": [
+      "linux/linux_users"
+    ],
+    "macos": [
+      "macos/macos_users"
+    ],
+    "win": []
+  },
+  "profiles": {
+    "ai_operation": [
+      "ai_model",
+      "message_context"
+    ],
+    "cloud": [
+      "api",
+      "cloud"
+    ],
+    "container": [
+      "container",
+      "namespace_pid"
+    ],
+    "data_classification": [
+      "data_classification",
+      "data_classifications"
+    ],
+    "datetime": [],
+    "host": [
+      "actor",
+      "device"
+    ],
+    "incident": [
+      "assignee",
+      "assignee_group",
+      "impact",
+      "impact_id",
+      "impact_score",
+      "is_suspected_breach",
+      "priority",
+      "priority_id",
+      "src_url",
+      "ticket",
+      "tickets",
+      "verdict",
+      "verdict_id"
+    ],
+    "linux/linux_users": [
+      "auid",
+      "egid",
+      "euid",
+      "group"
+    ],
+    "load_balancer": [
+      "load_balancer"
+    ],
+    "macos/macos_users": [
+      "egid",
+      "euid"
+    ],
+    "network_proxy": [
+      "proxy_connection_info",
+      "proxy_endpoint",
+      "proxy_http_request",
+      "proxy_http_response",
+      "proxy_tls",
+      "proxy_traffic"
+    ],
+    "osint": [
+      "osint"
+    ],
+    "security_control": [
+      "action",
+      "action_id",
+      "attacks",
+      "authorizations",
+      "confidence",
+      "confidence_id",
+      "confidence_score",
+      "disposition",
+      "disposition_id",
+      "firewall_rule",
+      "is_alert",
+      "malware",
+      "malware_scan_info",
+      "policy",
+      "risk_details",
+      "risk_level",
+      "risk_level_id",
+      "risk_score"
+    ],
+    "trace": [
+      "trace"
+    ]
+  }
+}

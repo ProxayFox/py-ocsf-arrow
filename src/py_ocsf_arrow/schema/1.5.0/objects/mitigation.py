@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'mitigation'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -32,6 +32,7 @@ def get_mitigation_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("name", pa.string(), nullable=True),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("uid", pa.string(), nullable=True),
         ]
     )

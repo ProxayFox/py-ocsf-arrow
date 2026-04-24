@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'dce_rpc'.
 
-Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.0.0.
 """
 
 import importlib.util
@@ -31,7 +31,9 @@ def get_dce_rpc_schema() -> pa.Schema:
             pa.field("flags", pa.list_(pa.string()), nullable=False),
             pa.field("opnum", pa.int32(), nullable=True),
             pa.field(
-                "rpc_interface", pa.struct(list(RPC_INTERFACE_SCHEMA)), nullable=False
+                "rpc_interface",
+                pa.struct(list(RPC_INTERFACE_SCHEMA)),
+                nullable=False,
             ),
         ]
     )

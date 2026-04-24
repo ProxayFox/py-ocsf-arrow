@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'access_analysis_result'.
 
-Generated from version 1.8.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.8.0.
 """
 
 import importlib.util
@@ -33,7 +33,9 @@ def get_access_analysis_result_schema() -> pa.Schema:
             pa.field("access_level", pa.string(), nullable=True),
             pa.field("access_type", pa.string(), nullable=True),
             pa.field(
-                "accessors", pa.list_(pa.struct(list(USER_SCHEMA))), nullable=False
+                "accessors",
+                pa.list_(pa.struct(list(USER_SCHEMA))),
+                nullable=False,
             ),
             pa.field(
                 "additional_restrictions",

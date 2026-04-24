@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'databucket'.
 
-Generated from version 1.4.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.4.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 AGENT_SCHEMA = _load_dep("agent").AGENT_SCHEMA
+DATA_CLASSIFICATION_SCHEMA = _load_dep("data_classification").DATA_CLASSIFICATION_SCHEMA
 ENCRYPTION_DETAILS_SCHEMA = _load_dep("encryption_details").ENCRYPTION_DETAILS_SCHEMA
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
 GROUP_SCHEMA = _load_dep("group").GROUP_SCHEMA
@@ -32,13 +33,25 @@ def get_databucket_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "agent_list", pa.list_(pa.struct(list(AGENT_SCHEMA))), nullable=True
+                "agent_list",
+                pa.list_(pa.struct(list(AGENT_SCHEMA))),
+                nullable=True,
             ),
             pa.field("cloud_partition", pa.string(), nullable=True),
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("criticality", pa.string(), nullable=True),
             pa.field("data", pa.string(), nullable=True),
+            pa.field(
+                "data_classification",
+                pa.struct(list(DATA_CLASSIFICATION_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "data_classifications",
+                pa.list_(pa.struct(list(DATA_CLASSIFICATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("desc", pa.string(), nullable=True),
             pa.field(
                 "encryption_details",
@@ -46,6 +59,7 @@ def get_databucket_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=True),
+            pa.field("group", pa.struct(list(GROUP_SCHEMA)), nullable=True),
             pa.field("groups", pa.list_(pa.struct(list(GROUP_SCHEMA))), nullable=True),
             pa.field("hostname", pa.string(), nullable=True),
             pa.field("ip", pa.string(), nullable=True),

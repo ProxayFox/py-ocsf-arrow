@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'evidences'.
 
-Generated from version 1.2.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.2.0.
 """
 
 import importlib.util
@@ -19,6 +19,9 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+CONTAINER_SCHEMA = _load_dep("container").CONTAINER_SCHEMA
 DATABASE_SCHEMA = _load_dep("database").DATABASE_SCHEMA
 DATABUCKET_SCHEMA = _load_dep("databucket").DATABUCKET_SCHEMA
 DNS_QUERY_SCHEMA = _load_dep("dns_query").DNS_QUERY_SCHEMA
@@ -34,22 +37,29 @@ def get_evidences_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF object 'evidences'."""
     return pa.schema(
         [
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field(
                 "connection_info",
                 pa.struct(list(NETWORK_CONNECTION_INFO_SCHEMA)),
                 nullable=True,
             ),
+            pa.field("container", pa.struct(list(CONTAINER_SCHEMA)), nullable=True),
             pa.field("data", pa.string(), nullable=True),
             pa.field("database", pa.struct(list(DATABASE_SCHEMA)), nullable=True),
             pa.field("databucket", pa.struct(list(DATABUCKET_SCHEMA)), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=True),
             pa.field("process", pa.struct(list(PROCESS_SCHEMA)), nullable=True),
             pa.field("query", pa.struct(list(DNS_QUERY_SCHEMA)), nullable=True),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
         ]
     )

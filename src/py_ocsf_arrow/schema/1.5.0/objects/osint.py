@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'osint'.
 
-Generated from version 1.5.0 at 2026-04-24T03:47:41+00:00.
+OCSF version 1.5.0.
 """
 
 import importlib.util
@@ -20,6 +20,7 @@ def _load_dep(name: str):
 
 
 ANALYTIC_SCHEMA = _load_dep("analytic").ANALYTIC_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
 AUTONOMOUS_SYSTEM_SCHEMA = _load_dep("autonomous_system").AUTONOMOUS_SYSTEM_SCHEMA
 CAMPAIGN_SCHEMA = _load_dep("campaign").CAMPAIGN_SCHEMA
 DIGITAL_SIGNATURE_SCHEMA = _load_dep("digital_signature").DIGITAL_SIGNATURE_SCHEMA
@@ -29,6 +30,7 @@ EMAIL_AUTH_SCHEMA = _load_dep("email_auth").EMAIL_AUTH_SCHEMA
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
 KILL_CHAIN_PHASE_SCHEMA = _load_dep("kill_chain_phase").KILL_CHAIN_PHASE_SCHEMA
 LOCATION_SCHEMA = _load_dep("location").LOCATION_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 REPUTATION_SCHEMA = _load_dep("reputation").REPUTATION_SCHEMA
 SCRIPT_SCHEMA = _load_dep("script").SCRIPT_SCHEMA
 THREAT_ACTOR_SCHEMA = _load_dep("threat_actor").THREAT_ACTOR_SCHEMA
@@ -42,7 +44,14 @@ def get_osint_schema() -> pa.Schema:
     return pa.schema(
         [
             pa.field(
-                "answers", pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))), nullable=True
+                "answers",
+                pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
             ),
             pa.field(
                 "autonomous_system",
@@ -52,6 +61,8 @@ def get_osint_schema() -> pa.Schema:
             pa.field("campaign", pa.struct(list(CAMPAIGN_SCHEMA)), nullable=True),
             pa.field("category", pa.string(), nullable=True),
             pa.field("comment", pa.string(), nullable=True),
+            pa.field("confidence", pa.string(), nullable=True),
+            pa.field("confidence_id", pa.int32(), nullable=True),
             pa.field("created_time", pa.int64(), nullable=True),
             pa.field("created_time_dt", pa.string(), nullable=True),
             pa.field("creator", pa.struct(list(USER_SCHEMA)), nullable=True),
@@ -73,6 +84,11 @@ def get_osint_schema() -> pa.Schema:
             ),
             pa.field("labels", pa.list_(pa.string()), nullable=True),
             pa.field("location", pa.struct(list(LOCATION_SCHEMA)), nullable=True),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("modified_time", pa.int64(), nullable=True),
             pa.field("modified_time_dt", pa.string(), nullable=True),
             pa.field("name", pa.string(), nullable=True),
@@ -83,6 +99,7 @@ def get_osint_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("reputation", pa.struct(list(REPUTATION_SCHEMA)), nullable=True),
+            pa.field("risk_score", pa.int32(), nullable=True),
             pa.field("script", pa.struct(list(SCRIPT_SCHEMA)), nullable=True),
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=True),
@@ -91,10 +108,13 @@ def get_osint_schema() -> pa.Schema:
                 pa.list_(pa.struct(list(DIGITAL_SIGNATURE_SCHEMA))),
                 nullable=True,
             ),
+            pa.field("src_url", pa.string(), nullable=True),
             pa.field("subdomains", pa.list_(pa.string()), nullable=True),
             pa.field("subnet", pa.string(), nullable=True),
             pa.field(
-                "threat_actor", pa.struct(list(THREAT_ACTOR_SCHEMA)), nullable=True
+                "threat_actor",
+                pa.struct(list(THREAT_ACTOR_SCHEMA)),
+                nullable=True,
             ),
             pa.field("tlp", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

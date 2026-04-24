@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF object 'cve'.
 
-Generated from version 1.7.0 at 2026-04-24T03:47:42+00:00.
+OCSF version 1.7.0.
 """
 
 import importlib.util
@@ -42,7 +42,9 @@ def get_cve_schema() -> pa.Schema:
             pa.field("product", pa.struct(list(PRODUCT_SCHEMA)), nullable=True),
             pa.field("references", pa.list_(pa.string()), nullable=True),
             pa.field(
-                "related_cwes", pa.list_(pa.struct(list(CWE_SCHEMA))), nullable=True
+                "related_cwes",
+                pa.list_(pa.struct(list(CWE_SCHEMA))),
+                nullable=True,
             ),
             pa.field("title", pa.string(), nullable=True),
             pa.field("type", pa.string(), nullable=True),

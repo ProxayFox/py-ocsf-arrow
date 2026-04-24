@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'file_activity'.
 
-Generated from version 1.0.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.0.0.
 """
 
 import importlib.util
@@ -19,8 +19,14 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
 FILE_SCHEMA = _load_dep("file").FILE_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 OBJECT_SCHEMA = _load_dep("object").OBJECT_SCHEMA
 OBSERVABLE_SCHEMA = _load_dep("observable").OBSERVABLE_SCHEMA
@@ -33,14 +39,25 @@ def get_file_activity_schema() -> pa.Schema:
             pa.field("access_mask", pa.int32(), nullable=True),
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=False),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field("component", pa.string(), nullable=True),
             pa.field("connection_uid", pa.string(), nullable=True),
             pa.field("count", pa.int32(), nullable=True),
             pa.field("create_mask", pa.string(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=False),
+            pa.field("disposition", pa.string(), nullable=True),
+            pa.field("disposition_id", pa.int32(), nullable=False),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
             pa.field("end_time_dt", pa.string(), nullable=True),
@@ -52,6 +69,11 @@ def get_file_activity_schema() -> pa.Schema:
             pa.field("file", pa.struct(list(FILE_SCHEMA)), nullable=False),
             pa.field("file_diff", pa.string(), nullable=True),
             pa.field("file_result", pa.struct(list(FILE_SCHEMA)), nullable=True),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("message", pa.string(), nullable=True),
             pa.field("metadata", pa.struct(list(METADATA_SCHEMA)), nullable=False),
             pa.field(

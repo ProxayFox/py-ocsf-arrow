@@ -1,6 +1,6 @@
 """Auto-generated Arrow schema for OCSF class 'dns_activity'.
 
-Generated from version 1.1.0 at 2026-04-24T03:47:40+00:00.
+OCSF version 1.1.0.
 """
 
 import importlib.util
@@ -19,9 +19,20 @@ def _load_dep(name: str):
     return mod
 
 
+ACTOR_SCHEMA = _load_dep("actor").ACTOR_SCHEMA
+API_SCHEMA = _load_dep("api").API_SCHEMA
+ATTACK_SCHEMA = _load_dep("attack").ATTACK_SCHEMA
+AUTHORIZATION_SCHEMA = _load_dep("authorization").AUTHORIZATION_SCHEMA
+CLOUD_SCHEMA = _load_dep("cloud").CLOUD_SCHEMA
+DEVICE_SCHEMA = _load_dep("device").DEVICE_SCHEMA
 DNS_ANSWER_SCHEMA = _load_dep("dns_answer").DNS_ANSWER_SCHEMA
 DNS_QUERY_SCHEMA = _load_dep("dns_query").DNS_QUERY_SCHEMA
 ENRICHMENT_SCHEMA = _load_dep("enrichment").ENRICHMENT_SCHEMA
+FIREWALL_RULE_SCHEMA = _load_dep("firewall_rule").FIREWALL_RULE_SCHEMA
+HTTP_REQUEST_SCHEMA = _load_dep("http_request").HTTP_REQUEST_SCHEMA
+HTTP_RESPONSE_SCHEMA = _load_dep("http_response").HTTP_RESPONSE_SCHEMA
+LOAD_BALANCER_SCHEMA = _load_dep("load_balancer").LOAD_BALANCER_SCHEMA
+MALWARE_SCHEMA = _load_dep("malware").MALWARE_SCHEMA
 METADATA_SCHEMA = _load_dep("metadata").METADATA_SCHEMA
 NETWORK_CONNECTION_INFO_SCHEMA = _load_dep(
     "network_connection_info"
@@ -38,24 +49,46 @@ def get_dns_activity_schema() -> pa.Schema:
     """Return the Arrow schema for OCSF class 'dns_activity'."""
     return pa.schema(
         [
+            pa.field("action", pa.string(), nullable=True),
+            pa.field("action_id", pa.int32(), nullable=False),
             pa.field("activity_id", pa.int32(), nullable=False),
             pa.field("activity_name", pa.string(), nullable=True),
+            pa.field("actor", pa.struct(list(ACTOR_SCHEMA)), nullable=True),
             pa.field(
-                "answers", pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))), nullable=True
+                "answers",
+                pa.list_(pa.struct(list(DNS_ANSWER_SCHEMA))),
+                nullable=True,
             ),
+            pa.field("api", pa.struct(list(API_SCHEMA)), nullable=True),
             pa.field("app_name", pa.string(), nullable=True),
+            pa.field(
+                "attacks",
+                pa.list_(pa.struct(list(ATTACK_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "authorizations",
+                pa.list_(pa.struct(list(AUTHORIZATION_SCHEMA))),
+                nullable=True,
+            ),
             pa.field("category_name", pa.string(), nullable=True),
             pa.field("category_uid", pa.int32(), nullable=False),
             pa.field("class_name", pa.string(), nullable=True),
             pa.field("class_uid", pa.int32(), nullable=False),
+            pa.field("cloud", pa.struct(list(CLOUD_SCHEMA)), nullable=False),
             pa.field(
                 "connection_info",
                 pa.struct(list(NETWORK_CONNECTION_INFO_SCHEMA)),
                 nullable=True,
             ),
             pa.field("count", pa.int32(), nullable=True),
+            pa.field("device", pa.struct(list(DEVICE_SCHEMA)), nullable=True),
+            pa.field("disposition", pa.string(), nullable=True),
+            pa.field("disposition_id", pa.int32(), nullable=True),
             pa.field(
-                "dst_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=True
+                "dst_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=True,
             ),
             pa.field("duration", pa.int32(), nullable=True),
             pa.field("end_time", pa.int64(), nullable=True),
@@ -63,6 +96,21 @@ def get_dns_activity_schema() -> pa.Schema:
             pa.field(
                 "enrichments",
                 pa.list_(pa.struct(list(ENRICHMENT_SCHEMA))),
+                nullable=True,
+            ),
+            pa.field(
+                "firewall_rule",
+                pa.struct(list(FIREWALL_RULE_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "load_balancer",
+                pa.struct(list(LOAD_BALANCER_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "malware",
+                pa.list_(pa.struct(list(MALWARE_SCHEMA))),
                 nullable=True,
             ),
             pa.field("message", pa.string(), nullable=True),
@@ -73,6 +121,32 @@ def get_dns_activity_schema() -> pa.Schema:
                 nullable=True,
             ),
             pa.field("proxy", pa.struct(list(NETWORK_PROXY_SCHEMA)), nullable=True),
+            pa.field(
+                "proxy_connection_info",
+                pa.struct(list(NETWORK_CONNECTION_INFO_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "proxy_endpoint",
+                pa.struct(list(NETWORK_PROXY_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "proxy_http_request",
+                pa.struct(list(HTTP_REQUEST_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field(
+                "proxy_http_response",
+                pa.struct(list(HTTP_RESPONSE_SCHEMA)),
+                nullable=True,
+            ),
+            pa.field("proxy_tls", pa.struct(list(TLS_SCHEMA)), nullable=True),
+            pa.field(
+                "proxy_traffic",
+                pa.struct(list(NETWORK_TRAFFIC_SCHEMA)),
+                nullable=True,
+            ),
             pa.field("query", pa.struct(list(DNS_QUERY_SCHEMA)), nullable=True),
             pa.field("query_time", pa.int64(), nullable=True),
             pa.field("query_time_dt", pa.string(), nullable=True),
@@ -84,7 +158,9 @@ def get_dns_activity_schema() -> pa.Schema:
             pa.field("severity", pa.string(), nullable=True),
             pa.field("severity_id", pa.int32(), nullable=False),
             pa.field(
-                "src_endpoint", pa.struct(list(NETWORK_ENDPOINT_SCHEMA)), nullable=False
+                "src_endpoint",
+                pa.struct(list(NETWORK_ENDPOINT_SCHEMA)),
+                nullable=False,
             ),
             pa.field("start_time", pa.int64(), nullable=True),
             pa.field("start_time_dt", pa.string(), nullable=True),
