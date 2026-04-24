@@ -219,10 +219,11 @@ def _render_object_file(
     version: str,
     timestamp: str,
     allowed_deps: set[str],
+    ignored_attrs: set[str] | None = None,
 ) -> str:
     ocsf_obj = generator.schema.objects[object_name]
     type_map = generator._type_mapper.OCSF_TO_ARROW
-    ignored = generator._ignored_attr
+    ignored = ignored_attrs if ignored_attrs is not None else generator._ignored_attr
     direct_deps: set[str] = set()
 
     fields_block = _render_fields_block(
@@ -261,10 +262,11 @@ def _render_class_file(
     generator: SchemaGenerator,
     version: str,
     timestamp: str,
+    ignored_attrs: set[str] | None = None,
 ) -> str:
     event_class = generator.schema.classes[class_name]
     type_map = generator._type_mapper.OCSF_TO_ARROW
-    ignored = generator._ignored_attr
+    ignored = ignored_attrs if ignored_attrs is not None else generator._ignored_attr
     direct_deps: set[str] = set()
 
     fields_block = _render_fields_block(
@@ -399,6 +401,45 @@ def _render_category_init(
 
 
 # ---------------------------------------------------------------------------
+# Profile metadata
+# ---------------------------------------------------------------------------
+
+_EXT_TO_PROFILES: dict[str, list[str]] = {
+    "linux": ["linux/linux_users"],
+    "macos": ["macos/macos_users"],
+    "win": [],
+}
+
+
+def _write_profile_metadata(
+    version_dir: Path,
+    schema,
+) -> None:
+    """Write ``_profiles.json`` so :class:`SchemaLoader` can filter at load time."""
+    profiles: dict[str, list[str]] = {}
+    if schema.profiles:
+        for name, profile in schema.profiles.items():
+            profiles[name] = (
+                sorted(profile.attributes.keys()) if profile.attributes else []
+            )
+
+    extension_profiles: dict[str, list[str]] = {}
+    if schema.extensions:
+        for ext_name in schema.extensions:
+            extension_profiles[ext_name] = _EXT_TO_PROFILES.get(ext_name, [ext_name])
+
+    metadata = {
+        "profiles": profiles,
+        "extension_profiles": extension_profiles,
+    }
+    path = version_dir / "_profiles.json"
+    path.write_text(
+        json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    print(f"    wrote metadata: {path}")
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -424,7 +465,11 @@ def _generate_version(
 
     type_map = generator._type_mapper.OCSF_TO_ARROW
     schema_objects = generator.schema.objects
-    ignored = generator._ignored_attr
+    # Include all profile/extension attributes in generated files;
+    # filtering happens at load time via SchemaLoader.
+    ignored: set[str] = set()
+
+    _write_profile_metadata(version_dir, generator.schema)
 
     # Build category UID -> dir-name mapping.
     cat_info: dict[int, str] = {}
@@ -480,6 +525,7 @@ def _generate_version(
             version,
             timestamp,
             allowed_deps=dep_graph[obj_name],
+            ignored_attrs=ignored,
         )
         obj_file.write_text(content, encoding="utf-8")
         print(f"    wrote object: {obj_file}")
@@ -496,7 +542,9 @@ def _generate_version(
 
         for full_uid, class_name in sorted(entries):
             class_file = cat_dir / f"{full_uid}_{class_name}.py"
-            content = _render_class_file(class_name, generator, version, timestamp)
+            content = _render_class_file(
+                class_name, generator, version, timestamp, ignored_attrs=ignored
+            )
             class_file.write_text(content, encoding="utf-8")
             print(f"    wrote class: {class_file}")
 

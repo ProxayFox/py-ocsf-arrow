@@ -103,8 +103,87 @@ for field in schema:
     print(f"{field.name}: {field.type}")
 ```
 
+## Profile and extension filtering
+
+Generated schemas include **all** OCSF profile and extension attributes.
+By default, `SchemaLoader` strips them so you get a base-only schema.
+
+### Base schema (default — no profiles)
+
+```python
+loader = SchemaLoader("1.8.0")
+schema = loader.load_class("vulnerability_finding")
+# Only base fields — no cloud, host, security_control, etc.
+```
+
+### Include specific profiles
+
+```python
+loader = SchemaLoader("1.8.0", prf=["cloud", "host"])
+schema = loader.load_class("vulnerability_finding")
+# Base fields + cloud and host profile attributes
+```
+
+### Include specific extensions
+
+```python
+loader = SchemaLoader("1.8.0", ext=["linux"])
+schema = loader.load_class("vulnerability_finding")
+# Base fields + attributes from the linux extension's implied profiles
+```
+
+### Include all profiles
+
+```python
+loader = SchemaLoader("1.8.0")
+all_profiles = loader.available_profiles()
+all_extensions = loader.available_extensions()
+
+full_loader = SchemaLoader("1.8.0", prf=all_profiles, ext=all_extensions)
+schema = full_loader.load_class("vulnerability_finding")
+# All 73 fields for vulnerability_finding in v1.8.0
+```
+
+### Module-level helper with profiles
+
+```python
+from py_ocsf_arrow import load_class_schema
+
+schema = load_class_schema(
+    "vulnerability_finding", version="1.8.0", prf=["cloud"]
+)
+```
+
+### Semantics
+
+| Parameter            | Effect                                                         |
+| -------------------- | -------------------------------------------------------------- |
+| `prf=None` (default) | Exclude all profile attributes (base only)                     |
+| `prf=[]`             | Same as `None` — exclude all                                   |
+| `prf=["cloud"]`      | Include only cloud profile attributes                          |
+| `ext=None` (default) | Exclude all extension-contributed attributes                   |
+| `ext=["linux"]`      | Include attributes from the Linux extension's implied profiles |
+
+!!! note
+    Profile filtering applies to **class schemas only**. Object schemas are
+    not modified by profiles in OCSF, so `load_object()` always returns the
+    full object schema regardless of `ext`/`prf` settings.
+
+## Discover available profiles and extensions
+
+```python
+loader = SchemaLoader("1.8.0")
+
+loader.available_profiles()
+# ['ai_operation', 'cloud', 'container', 'data_classification', ...]
+
+loader.available_extensions()
+# ['linux', 'macos', 'win']
+```
+
 ## Notes
 
 - `SchemaLoader` caches the category module per instance, so loading multiple classes from the same category (e.g. two findings) only loads the category `__init__.py` once.
 - Version directories use exact OCSF version strings (`1.8.0`, not `v1_8_0`), which is why this loader exists — those directory names cannot be used as Python import segments.
+- Profile metadata is stored in `_profiles.json` per version directory, written at generation time. If the file is missing, re-run `just generate`.
 - If you want schemas without generating files first, use the runtime API instead: [`SchemaGenerator`](schema-generator.md).

@@ -169,3 +169,71 @@ class TestModuleLevelHelpers:
     def test_load_object_default_version(self):
         schema = load_object_schema("cve")
         assert isinstance(schema, pa.Schema)
+
+    def test_load_class_with_profile(self):
+        schema = load_class_schema(
+            "vulnerability_finding", version="1.8.0", prf=["cloud"]
+        )
+        assert isinstance(schema, pa.Schema)
+
+
+# ---------------------------------------------------------------------------
+# Profile / extension filtering
+# ---------------------------------------------------------------------------
+
+
+class TestProfileFiltering:
+    def test_default_excludes_profile_attrs(self, loader: SchemaLoader):
+        """Default loader (prf=None) produces a base schema without profile fields."""
+        base_schema = loader.load_class("vulnerability_finding")
+        # 'cloud' profile contributes the "cloud" attribute — it should be absent.
+        assert "cloud" not in base_schema.names
+
+    def test_explicit_profile_includes_attrs(self):
+        loader = SchemaLoader("1.8.0", prf=["cloud"])
+        schema = loader.load_class("vulnerability_finding")
+        assert "cloud" in schema.names
+
+    def test_all_profiles_produces_larger_schema(self):
+        base = SchemaLoader("1.8.0")
+        all_profs = base.available_profiles()
+        all_exts = base.available_extensions()
+        full = SchemaLoader("1.8.0", prf=all_profs, ext=all_exts)
+
+        base_schema = base.load_class("vulnerability_finding")
+        full_schema = full.load_class("vulnerability_finding")
+        assert len(full_schema) > len(base_schema)
+
+    def test_invalid_profile_raises(self):
+        with pytest.raises(ValueError, match="not found"):
+            SchemaLoader("1.8.0", prf=["not_a_real_profile"])
+
+    def test_invalid_extension_raises(self):
+        with pytest.raises(ValueError, match="not found"):
+            SchemaLoader("1.8.0", ext=["not_a_real_extension"])
+
+    def test_objects_are_not_filtered(self):
+        """Object schemas don't have profile attributes — should be unchanged."""
+        base_loader = SchemaLoader("1.8.0")
+        all_profs = base_loader.available_profiles()
+        full_loader = SchemaLoader("1.8.0", prf=all_profs)
+        assert base_loader.load_object("cve") == full_loader.load_object("cve")
+
+
+class TestProfileDiscovery:
+    def test_available_profiles_returns_list(self, loader: SchemaLoader):
+        profiles = loader.available_profiles()
+        assert isinstance(profiles, list)
+        assert len(profiles) > 0
+        assert all(isinstance(p, str) for p in profiles)
+
+    def test_available_profiles_includes_cloud(self, loader: SchemaLoader):
+        assert "cloud" in loader.available_profiles()
+
+    def test_available_extensions_returns_list(self, loader: SchemaLoader):
+        extensions = loader.available_extensions()
+        assert isinstance(extensions, list)
+        assert len(extensions) > 0
+
+    def test_available_extensions_includes_linux(self, loader: SchemaLoader):
+        assert "linux" in loader.available_extensions()
