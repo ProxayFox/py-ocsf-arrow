@@ -1,3 +1,15 @@
+"""Generate PyArrow schemas from OCSF event class and object definitions.
+
+The :class:`SchemaGenerator` builds Arrow schemas at runtime by traversing OCSF
+class and object attribute definitions, resolving OCSF types to Arrow data types,
+and handling nested objects and array types. It respects profile and extension
+filtering to exclude attributes that are not part of the active configuration.
+
+This module provides :class:`SchemaGenerator` and the method :meth:`~SchemaGenerator.ocsf_type_to_arrow`
+to convert individual OCSF type names to Arrow types, which is also used for nested
+object schema resolution.
+"""
+
 from ocsf.schema import OcsfObject
 import pyarrow as pa
 from functools import cached_property

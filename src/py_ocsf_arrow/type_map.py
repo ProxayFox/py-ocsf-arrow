@@ -1,3 +1,15 @@
+"""Map OCSF scalar and derived types to PyArrow data types.
+
+The :class:`TypeMapper` translates OCSF primitive types (e.g. ``boolean_t``,
+``string_t``, ``long_t``) and schema-defined derived types into their corresponding
+PyArrow scalar types. It builds and caches the complete type mapping for a given
+OCSF schema version and is used as the shared type-resolution layer by schema
+generation and other Arrow-backed operations.
+
+This module provides :class:`TypeMapper` and the method :meth:`~TypeMapper.build_ocsf_to_arrow_mapping`
+to construct or update the type mapping from schema metadata.
+"""
+
 import pyarrow as pa
 from functools import cached_property
 from typing import TypeAlias

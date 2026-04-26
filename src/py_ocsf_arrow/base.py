@@ -1,3 +1,14 @@
+"""Provide the shared OCSF Arrow runtime foundation.
+
+The :class:`OCSFArrow` base class manages the integration between the OCSF API
+client and Arrow schema generation. It handles version selection, schema loading,
+caching configuration, and the computation of which profile and extension attributes
+to include or exclude when building schemas.
+
+This module provides :class:`OCSFArrow` as a factory base (:meth:`~OCSFArrow.init`)
+that higher-level schema generators and type mappers inherit from.
+"""
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
