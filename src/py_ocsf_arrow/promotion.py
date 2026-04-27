@@ -53,15 +53,15 @@ class ScoringConfig:
       measurable duplication pressure
     """
 
-    complexity_weight: float = 0.25
-    connectivity_weight: float = 0.25
-    entity_weight: float = 0.25
-    storage_weight: float = 0.10
-    queryability_weight: float = 0.15
+    complexity_weight: float = 0.30
+    connectivity_weight: float = 0.35
+    entity_weight: float = 0.20
+    storage_weight: float = 0.05
+    queryability_weight: float = 0.10
 
-    subtree_weight_denominator: float = 150.0
-    depth_denominator: float = 3.0
-    fan_in_denominator: float = 100.0
+    subtree_weight_denominator: float = 110.0
+    depth_denominator: float = 2.5
+    fan_in_denominator: float = 80.0
     fan_out_denominator: float = 12.0
     storage_denominator: float = 500_000.0
 
@@ -70,13 +70,13 @@ class ScoringConfig:
     connectivity_fan_in_factor_weight: float = 0.4
     connectivity_fan_out_factor_weight: float = 0.6
 
-    promote_threshold: float = 0.55
-    review_threshold: float = 0.35
+    promote_threshold: float = 0.66
+    review_threshold: float = 0.40
     avg_bytes_per_attr: float = 15.0
     depth_penalty_per_level: float = 10.0
     update_benefit_value: float = 20.0
     pass2_promote_threshold: float = 15.0
-    pass2_review_threshold: float = 0.0
+    pass2_review_threshold: float = 0.05
 
     identity_signal_names: frozenset[str] = field(
         default_factory=lambda: frozenset(
@@ -252,6 +252,13 @@ def analyze_object(
     else:
         queryability_score = 0.0
 
+    structured_entity_candidate = (
+        has_identity_field
+        and scalar_attr_count >= 4
+        and object_attr_count >= 3
+        and class_fan_in >= 10
+    )
+
     composite_score = (
         complexity_score * cfg.complexity_weight
         + connectivity_score * cfg.connectivity_weight
@@ -261,6 +268,8 @@ def analyze_object(
     )
 
     if composite_score >= cfg.promote_threshold:
+        verdict = Verdict.PROMOTE
+    elif structured_entity_candidate:
         verdict = Verdict.PROMOTE
     elif composite_score >= cfg.review_threshold:
         verdict = Verdict.REVIEW
