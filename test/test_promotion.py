@@ -6,7 +6,12 @@ from typing import cast
 import pytest
 
 from py_ocsf_arrow.object_graph import SchemaLike, build_dependency_graph
-from py_ocsf_arrow.promotion import ScoringConfig, Verdict, analyze_object
+from py_ocsf_arrow.promotion import (
+    ScoringConfig,
+    Verdict,
+    analyze_object,
+    run_promotion_analysis,
+)
 
 
 @dataclass(slots=True)
@@ -46,6 +51,15 @@ def _analyze(schema: FakeSchema, object_name: str, config: ScoringConfig | None 
         graph[object_name],
         config=config,
     )
+
+
+def _run_analysis(
+    schema: FakeSchema,
+    config: ScoringConfig | None = None,
+    overrides: dict[str, Verdict] | None = None,
+):
+    typed_schema = cast(SchemaLike, schema)
+    return run_promotion_analysis(typed_schema, config=config, overrides=overrides)
 
 
 class TestPromotionScoring:
@@ -449,3 +463,356 @@ class TestPromotionScoring:
         assert deep_analysis.subtree_weight == shallow_analysis.subtree_weight
         assert deep_analysis.depth > shallow_analysis.depth
         assert deep_analysis.complexity_score > shallow_analysis.complexity_score
+
+
+class TestPromotionPassTwo:
+    def test_depth_2_demotes_review_object(self):
+        schema = FakeSchema(
+            classes={
+                **{
+                    f"class_{i}": FakeContainer(
+                        name=f"class_{i}",
+                        caption=f"Class {i}",
+                        attributes={"parent": _object_attr("parent")},
+                    )
+                    for i in range(4)
+                }
+            },
+            objects={
+                "parent": FakeContainer(
+                    name="parent",
+                    caption="Parent",
+                    attributes={
+                        "uid": _scalar_attr(),
+                        "name": _scalar_attr(),
+                        "region": _scalar_attr(),
+                        "child": _object_attr("child"),
+                    },
+                ),
+                "child": FakeContainer(
+                    name="child",
+                    caption="Child",
+                    attributes={
+                        "desc": _scalar_attr(),
+                        "leaf": _object_attr("leaf"),
+                    },
+                ),
+                "leaf": FakeContainer(
+                    name="leaf",
+                    caption="Leaf",
+                    attributes={"value": _scalar_attr()},
+                ),
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(schema, config=config)
+        analysis_map = {analysis.name: analysis for analysis in analyses}
+
+        assert analysis_map["parent"].verdict == Verdict.PROMOTE
+        assert analysis_map["child"].effective_depth == 2
+        assert analysis_map["child"].pass2_benefit is not None
+        assert analysis_map["child"].pass2_benefit <= 0.0
+        assert analysis_map["child"].verdict == Verdict.EMBED
+
+    def test_depth_1_object_stays_unaffected(self):
+        schema = FakeSchema(
+            classes={
+                "finding": FakeContainer(
+                    name="finding",
+                    caption="Finding",
+                    attributes={"candidate": _object_attr("candidate")},
+                )
+            },
+            objects={
+                "candidate": FakeContainer(
+                    name="candidate",
+                    caption="Candidate",
+                    attributes={
+                        "desc": _scalar_attr(),
+                        "leaf": _object_attr("leaf"),
+                    },
+                ),
+                "leaf": FakeContainer(
+                    name="leaf",
+                    caption="Leaf",
+                    attributes={"value": _scalar_attr()},
+                ),
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(schema, config=config)
+        analysis_map = {analysis.name: analysis for analysis in analyses}
+
+        assert analysis_map["candidate"].effective_depth == 1
+        assert analysis_map["candidate"].verdict == Verdict.REVIEW
+
+    def test_already_promote_object_skips_pass_2(self):
+        schema = FakeSchema(
+            classes={
+                "finding": FakeContainer(
+                    name="finding",
+                    caption="Finding",
+                    attributes={"entity": _object_attr("entity")},
+                )
+            },
+            objects={
+                "entity": FakeContainer(
+                    name="entity",
+                    caption="Entity",
+                    attributes={
+                        "uid": _scalar_attr(),
+                        "name": _scalar_attr(),
+                        "region": _scalar_attr(),
+                    },
+                )
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(schema, config=config)
+        entity = next(analysis for analysis in analyses if analysis.name == "entity")
+
+        assert entity.verdict == Verdict.PROMOTE
+        assert entity.effective_depth is None
+        assert entity.pass2_benefit is None
+
+    def test_override_forces_embed_on_promote_object(self):
+        schema = FakeSchema(
+            classes={
+                "finding": FakeContainer(
+                    name="finding",
+                    caption="Finding",
+                    attributes={"entity": _object_attr("entity")},
+                )
+            },
+            objects={
+                "entity": FakeContainer(
+                    name="entity",
+                    caption="Entity",
+                    attributes={
+                        "uid": _scalar_attr(),
+                        "name": _scalar_attr(),
+                        "region": _scalar_attr(),
+                    },
+                )
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(
+            schema,
+            config=config,
+            overrides={"entity": Verdict.EMBED},
+        )
+        entity = next(analysis for analysis in analyses if analysis.name == "entity")
+
+        assert entity.composite_score > 0.0
+        assert entity.verdict == Verdict.EMBED
+        assert entity.overridden is True
+
+    def test_override_forces_promote_on_embed_object(self):
+        schema = FakeSchema(
+            objects={
+                "fingerprint": FakeContainer(
+                    name="fingerprint",
+                    caption="Fingerprint",
+                    attributes={
+                        "algorithm": _scalar_attr(),
+                        "algorithm_id": _scalar_attr("integer_t"),
+                        "value": _scalar_attr(),
+                    },
+                )
+            }
+        )
+
+        analyses = _run_analysis(
+            schema,
+            overrides={"fingerprint": Verdict.PROMOTE},
+        )
+        fingerprint = next(
+            analysis for analysis in analyses if analysis.name == "fingerprint"
+        )
+
+        assert fingerprint.verdict == Verdict.PROMOTE
+        assert fingerprint.overridden is True
+
+    def test_no_overrides_has_no_effect(self):
+        schema = FakeSchema(
+            objects={
+                "fingerprint": FakeContainer(
+                    name="fingerprint",
+                    caption="Fingerprint",
+                    attributes={
+                        "algorithm": _scalar_attr(),
+                        "algorithm_id": _scalar_attr("integer_t"),
+                        "value": _scalar_attr(),
+                    },
+                )
+            }
+        )
+
+        analyses_none = _run_analysis(schema)
+        analyses_empty = _run_analysis(schema, overrides={})
+        analysis_none = next(
+            analysis for analysis in analyses_none if analysis.name == "fingerprint"
+        )
+        analysis_empty = next(
+            analysis for analysis in analyses_empty if analysis.name == "fingerprint"
+        )
+
+        assert analysis_none.verdict == analysis_empty.verdict
+        assert analysis_none.overridden is False
+        assert analysis_empty.overridden is False
+
+    def test_pass_2_records_benefit_and_depth(self):
+        schema = FakeSchema(
+            classes={
+                **{
+                    f"class_{i}": FakeContainer(
+                        name=f"class_{i}",
+                        caption=f"Class {i}",
+                        attributes={"parent": _object_attr("parent")},
+                    )
+                    for i in range(4)
+                }
+            },
+            objects={
+                "parent": FakeContainer(
+                    name="parent",
+                    caption="Parent",
+                    attributes={
+                        "uid": _scalar_attr(),
+                        "name": _scalar_attr(),
+                        "region": _scalar_attr(),
+                        "child": _object_attr("child"),
+                    },
+                ),
+                "child": FakeContainer(
+                    name="child",
+                    caption="Child",
+                    attributes={
+                        "desc": _scalar_attr(),
+                        "leaf": _object_attr("leaf"),
+                    },
+                ),
+                "leaf": FakeContainer(
+                    name="leaf",
+                    caption="Leaf",
+                    attributes={"value": _scalar_attr()},
+                ),
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(schema, config=config)
+        child = next(analysis for analysis in analyses if analysis.name == "child")
+
+        assert child.effective_depth is not None
+        assert child.pass2_benefit is not None
+
+    def test_full_synthetic_orchestration(self):
+        schema = FakeSchema(
+            classes={
+                "finding_a": FakeContainer(
+                    name="finding_a",
+                    caption="Finding A",
+                    attributes={"entity": _object_attr("entity")},
+                ),
+                "finding_b": FakeContainer(
+                    name="finding_b",
+                    caption="Finding B",
+                    attributes={"fingerprint": _object_attr("fingerprint")},
+                ),
+            },
+            objects={
+                "entity": FakeContainer(
+                    name="entity",
+                    caption="Entity",
+                    attributes={
+                        "uid": _scalar_attr(),
+                        "name": _scalar_attr(),
+                        "region": _scalar_attr(),
+                        "nested": _object_attr("nested"),
+                    },
+                ),
+                "fingerprint": FakeContainer(
+                    name="fingerprint",
+                    caption="Fingerprint",
+                    attributes={
+                        "algorithm": _scalar_attr(),
+                        "algorithm_id": _scalar_attr("integer_t"),
+                        "value": _scalar_attr(),
+                    },
+                ),
+                "nested": FakeContainer(
+                    name="nested",
+                    caption="Nested",
+                    attributes={
+                        "desc": _scalar_attr(),
+                        "fingerprint": _object_attr("fingerprint"),
+                    },
+                ),
+            },
+        )
+        config = ScoringConfig(
+            complexity_weight=0.0,
+            connectivity_weight=0.0,
+            entity_weight=1.0,
+            storage_weight=0.0,
+            queryability_weight=0.0,
+            promote_threshold=0.8,
+            review_threshold=0.25,
+        )
+
+        analyses = _run_analysis(schema, config=config)
+        analysis_map = {analysis.name: analysis for analysis in analyses}
+
+        assert analysis_map["entity"].verdict == Verdict.PROMOTE
+        assert analysis_map["fingerprint"].verdict == Verdict.EMBED
+        assert analysis_map["nested"].verdict == Verdict.EMBED
+        assert [analysis.composite_score for analysis in analyses] == sorted(
+            (analysis.composite_score for analysis in analyses),
+            reverse=True,
+        )

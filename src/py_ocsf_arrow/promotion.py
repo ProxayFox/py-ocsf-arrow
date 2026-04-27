@@ -15,6 +15,7 @@ from .object_graph import (
     ObjectNode,
     SchemaLike,
     WithAttributesLike,
+    build_dependency_graph,
     calc_depth,
     calc_subtree_weight,
 )
@@ -72,6 +73,10 @@ class ScoringConfig:
     promote_threshold: float = 0.55
     review_threshold: float = 0.35
     avg_bytes_per_attr: float = 15.0
+    depth_penalty_per_level: float = 10.0
+    update_benefit_value: float = 20.0
+    pass2_promote_threshold: float = 15.0
+    pass2_review_threshold: float = 0.0
 
     identity_signal_names: frozenset[str] = field(
         default_factory=lambda: frozenset(
@@ -170,6 +175,9 @@ class ObjectAnalysis:
     queryability_score: float
     composite_score: float
     verdict: Verdict
+    effective_depth: int | None = None
+    pass2_benefit: float | None = None
+    overridden: bool = False
 
 
 def analyze_object(
@@ -279,3 +287,110 @@ def analyze_object(
         composite_score=composite_score,
         verdict=verdict,
     )
+
+
+def _estimate_storage_savings(analysis: ObjectAnalysis, config: ScoringConfig) -> float:
+    """Convert the normalized storage score into a pass-2 benefit proxy.
+
+    Pass 1 keeps storage amplification normalized to the 0.0–1.0 range. For
+    pass 2 we scale that score into the same rough band as the depth penalty and
+    update-benefit values so deeper nested objects can be demoted meaningfully
+    without recomputing a second, unrelated storage model.
+    """
+
+    return analysis.storage_amplification_score * config.pass2_promote_threshold
+
+
+def _effective_depth(
+    analysis: ObjectAnalysis,
+    graph: dict[str, ObjectNode],
+    pass1_verdicts: dict[str, Verdict],
+) -> int:
+    """Return the effective fact-table depth used by pass 2.
+
+    The return values follow the planning rules:
+
+    - ``1`` when an object is directly referenced by at least one class
+    - ``2`` when it is only referenced by objects and at least one parent was
+      already a pass-1 ``PROMOTE``
+    - ``3`` as the representative value for ``3+`` when all known parents are
+      nested/non-promoted objects
+    - ``0`` when the object has no known parents in the provided schema view
+    """
+
+    if analysis.class_fan_in > 0:
+        return 1
+    if analysis.object_fan_in <= 0:
+        return 0
+
+    object_parents = {
+        parent_name
+        for parent_kind, parent_name, _ in graph[analysis.name].referenced_by
+        if parent_kind == "object"
+    }
+    if any(
+        pass1_verdicts.get(parent_name) == Verdict.PROMOTE
+        for parent_name in object_parents
+    ):
+        return 2
+    return 3
+
+
+def run_promotion_analysis(
+    schema: SchemaLike,
+    config: ScoringConfig | None = None,
+    overrides: dict[str, Verdict] | None = None,
+) -> list[ObjectAnalysis]:
+    """Run the full two-pass promotion analysis for every object in *schema*.
+
+    This is the primary public entry point for downstream consumers. It:
+
+    1. builds the full dependency graph
+    2. runs pass-1 per-object scoring
+    3. applies pass-2 depth/benefit adjustments to non-promoted objects
+    4. applies final operator overrides
+    5. returns the full analysis sorted by composite score descending
+    """
+
+    cfg = ScoringConfig() if config is None else config
+    override_map = {} if overrides is None else overrides
+
+    graph = build_dependency_graph(schema)
+    analyses: list[ObjectAnalysis] = []
+    for name, obj_def in schema.objects.items():
+        analyses.append(analyze_object(name, obj_def, schema, graph[name], config=cfg))
+
+    pass1_verdicts = {analysis.name: analysis.verdict for analysis in analyses}
+
+    for analysis in analyses:
+        if analysis.verdict == Verdict.PROMOTE:
+            continue
+
+        analysis.effective_depth = _effective_depth(analysis, graph, pass1_verdicts)
+        storage_savings_estimate = _estimate_storage_savings(analysis, cfg)
+        update_benefit = (
+            cfg.update_benefit_value if analysis.has_identity_field else 0.0
+        )
+        analysis.pass2_benefit = (
+            storage_savings_estimate
+            + update_benefit
+            - (analysis.effective_depth * cfg.depth_penalty_per_level)
+        )
+
+        if analysis.effective_depth <= 1:
+            continue
+
+        if analysis.pass2_benefit <= cfg.pass2_review_threshold:
+            analysis.verdict = Verdict.EMBED
+        elif analysis.pass2_benefit <= cfg.pass2_promote_threshold:
+            analysis.verdict = Verdict.REVIEW
+        else:
+            analysis.verdict = Verdict.PROMOTE
+
+    for analysis in analyses:
+        if analysis.name not in override_map:
+            continue
+        analysis.verdict = override_map[analysis.name]
+        analysis.overridden = True
+
+    return sorted(analyses, key=lambda analysis: analysis.composite_score, reverse=True)
