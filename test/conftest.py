@@ -35,3 +35,15 @@ def ocsf_schemas(
 ) -> dict[str, OcsfSchema]:
     """Get the OCSF schemas for the specified versions."""
     return {version: get_schema(version, ocsf_client) for version in ocsf_versions}
+
+
+@pytest.fixture(scope="session")
+def ocsf_schema_1_8_0(ocsf_client: OcsfApiClient) -> OcsfSchema:
+    """Load the OCSF 1.8.0 schema once for integration tests.
+
+    This uses the same ``ocsf-lib`` client-based loading path already used by
+    the test suite. No explicit profiles or extensions are requested here,
+    matching the repository's default loading behavior.
+    """
+
+    return get_schema("1.8.0", ocsf_client)
