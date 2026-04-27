@@ -158,6 +158,7 @@ env.bak/
 venv.bak/
 .cache
 outputs
+.github/plans/
 
 # Spyder project settings
 .spyderproject
