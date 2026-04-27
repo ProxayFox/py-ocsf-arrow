@@ -92,7 +92,7 @@ def _schema_metadata(schema: pa.Schema) -> ArrowMetadata | None:
 
     if schema.metadata is None:
         return None
-    return dict(schema.metadata)
+    return cast(ArrowMetadata, dict(schema.metadata))
 
 
 def _field_object_type(field: pa.Field, config: TransformConfig) -> str | None:
