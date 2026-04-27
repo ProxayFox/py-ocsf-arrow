@@ -22,6 +22,19 @@ Builds runtime `pyarrow.Schema` objects for classes and objects, including neste
 
 Writes version-isolated Python schema modules to `src/py_ocsf_arrow/schema/<version>/...`.
 
+### Promotion analysis and transform pipeline
+
+The repository also includes an opt-in promotion-analysis workflow that:
+
+1. scores OCSF objects for standalone-table suitability
+2. emits operator-facing summary, JSON, or CSV reports
+3. can post-process generated class schemas to replace promoted embedded objects
+  with foreign-key fields and emit standalone promoted-object schemas
+
+This workflow does not change the default schema view. Base-only runtime loading
+and generated schema modules remain the default behavior unless an operator runs
+the analysis/transform tooling explicitly.
+
 ## Version isolation
 
 Generated schema files are isolated by OCSF version:
@@ -57,6 +70,7 @@ Because of that, both the generated loader packages and the generated schema fil
 - Arrow type mapping
 - runtime schema generation
 - generated versioned schema modules
+- opt-in promotion analysis and transform reporting
 
 ### Out of scope today
 

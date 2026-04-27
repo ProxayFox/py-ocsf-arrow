@@ -112,3 +112,42 @@ schema = generator.build_class_schema("vulnerability_finding")
 ```
 
 Use generated modules when reproducibility, checked-in artifacts, or release automation matter more than simplicity.
+
+## Promotion analysis workflow
+
+Schema generation remains the default path, but the repository also provides an
+operator-facing promotion analysis CLI at `scripts/analyze_promotions.py`.
+
+It can be used to:
+
+- identify which OCSF objects are good candidates for promotion into standalone
+  tables or schemas
+- review the scoring output as summary text, JSON, or CSV
+- optionally run the opt-in transformation step that rewrites promoted embedded
+  objects into foreign-key fields
+
+Example usage:
+
+```bash
+uv run scripts/analyze_promotions.py \
+  --version 1.8.0 \
+  --format summary \
+  --override metadata=EMBED \
+  --override endpoint=EMBED
+```
+
+To write transformed schemas as serialized Arrow schema files:
+
+```bash
+uv run scripts/analyze_promotions.py \
+  --version 1.8.0 \
+  --transform \
+  --transform-output outputs/promotion-transform \
+  --override metadata=EMBED \
+  --override endpoint=EMBED
+```
+
+Overrides are operator-supplied and follow `NAME=VERDICT`, for example
+`metadata=EMBED`. REVIEW verdicts are non-strict by default; use
+`--strict-review` if REVIEW objects should fail the transform step instead of
+remaining embedded.

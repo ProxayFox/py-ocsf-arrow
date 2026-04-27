@@ -177,6 +177,30 @@ spec.loader.exec_module(mod)
 schema = mod.get_vulnerability_finding_schema()
 ```
 
+### Analyze promotion candidates
+
+Use the analysis script to score OCSF objects for table-promotion suitability and,
+optionally, run the opt-in schema transformation pipeline.
+
+```bash
+# Analysis only
+uv run scripts/analyze_promotions.py \
+  --version 1.8.0 \
+  --override metadata=EMBED \
+  --override endpoint=EMBED
+
+# Analysis plus transformed schema output
+uv run scripts/analyze_promotions.py \
+  --version 1.8.0 \
+  --transform \
+  --transform-output outputs/promotion-transform \
+  --override metadata=EMBED \
+  --override endpoint=EMBED
+```
+
+The analysis is opt-in and does **not** change the repository's default base-only
+schema generation or loading behavior.
+
 ### With Nix
 
 ```bash
