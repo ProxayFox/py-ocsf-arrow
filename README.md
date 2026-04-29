@@ -100,15 +100,27 @@ That means the following are still planned work:
 ├── docs/                   # MkDocs site content
 ├── scripts/                # Code generation utilities
 ├── src/
-│   └── py_ocsf_arrow/      # Runtime helpers and generated schema modules
-├── test/                   # Tests for mapping, schema generation, and loading
+│   ├── py_ocsf_arrow/      # Core Arrow-native OCSF library (workspace member)
+│   ├── py_ocsf_clickhouse/ # ClickHouse backend package (workspace member)
+│   └── py_ocsf_postgresql/ # PostgreSQL backend package (workspace member)
+├── test/                   # Shared tests for all packages
 ├── flake.nix               # Nix development shell
 ├── justfile                # Local development shortcuts
 ├── main.py                 # Placeholder launcher
 ├── mkdocs.yml              # MkDocs site configuration
-├── pyproject.toml          # Project metadata
+├── pyproject.toml          # Workspace manifest (shared dev tooling)
 └── README.md
 ```
+
+### Workspace packages
+
+| Distribution name | Import package | Description |
+| --- | --- | --- |
+| `py-ocsf-arrow` | `py_ocsf_arrow` | Core Arrow-native OCSF primitives: schema loading, type mapping, and schema generation |
+| `py-ocsf-clickhouse` | `py_ocsf_clickhouse` | ClickHouse backend — depends on `py-ocsf-arrow` (scaffold) |
+| `py-ocsf-postgresql` | `py_ocsf_postgresql` | PostgreSQL backend — depends on `py-ocsf-arrow` (scaffold) |
+
+The root `pyproject.toml` is a virtual workspace manifest that holds shared dev tooling, dependency groups, and tool configuration. Each package under `src/` has its own `pyproject.toml` with independent metadata and dependencies.
 
 ## Local development
 
@@ -126,7 +138,7 @@ uv run python main.py
 For contributor workflows including docs and tests:
 
 ```bash
-uv sync --group dev --extra docs
+uv sync --group dev --group docs
 ```
 
 ### Generate callable schema modules

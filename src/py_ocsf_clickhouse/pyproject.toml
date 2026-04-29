@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py-ocsf-clickhouse"
+version = "0.1.0"
+description = "ClickHouse backend for py-ocsf-arrow OCSF schemas."
+requires-python = ">=3.14"
+license = "Apache-2.0"
+authors = [
+    { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
+]
+dependencies = ["py-ocsf-arrow>=0.1.0"]
+
+[tool.uv.sources]
+py-ocsf-arrow = { workspace = true }
+
+[tool.setuptools]
+package-dir = { "py_ocsf_clickhouse" = "." }
+packages = ["py_ocsf_clickhouse"]

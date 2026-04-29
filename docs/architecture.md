@@ -4,6 +4,16 @@
 
 `py-ocsf-arrow` exists to turn OCSF metadata into Arrow-native schema building blocks that are reusable, typed, and easy to integrate into larger security data pipelines.
 
+## Workspace packages
+
+The repository is a `uv` workspace containing three packages:
+
+- **`py-ocsf-arrow`** (`py_ocsf_arrow`) — the core library for Arrow-native OCSF primitives.
+- **`py-ocsf-clickhouse`** (`py_ocsf_clickhouse`) — ClickHouse backend, depends on the core Arrow package. Currently a scaffold.
+- **`py-ocsf-postgresql`** (`py_ocsf_postgresql`) — PostgreSQL backend, depends on the core Arrow package. Currently a scaffold.
+
+Backend packages import Arrow primitives (e.g. `SchemaGenerator`, `TypeMapper`) from `py_ocsf_arrow` through a workspace dependency. They do not duplicate core logic.
+
 ## Current implemented layers
 
 ### `OCSFArrow`
@@ -74,6 +84,8 @@ Because of that, both the generated loader packages and the generated schema fil
 
 ### Out of scope today
 
+- ClickHouse DDL generation (package scaffolded, implementation pending)
+- PostgreSQL DDL generation (package scaffolded, implementation pending)
 - provider-specific transforms
 - API clients for vendor data sources
 - batch builder/container APIs

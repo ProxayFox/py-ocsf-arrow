@@ -44,10 +44,10 @@ generate VERSION="all":
 
 # --- Documentation ---
 docs-build:
-    uv run --extra docs mkdocs build --strict
+    uv run --group docs mkdocs build --strict
 
 docs-serve:
-    uv run --extra docs mkdocs serve
+    uv run --group docs mkdocs serve
 
 docs-validate:
-    uv run --extra docs mkdocs build --strict
+    uv run --group docs mkdocs build --strict
