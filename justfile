@@ -30,6 +30,7 @@ test-all:
 
 typecheck:
     uv run ty check --project .
+    uvx pyright --threads
 
 quality:
     if ! just lint; then just lint-fix; fi

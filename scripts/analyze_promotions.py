@@ -282,8 +282,8 @@ def main(
     stderr: TextIO | None = None,
 ) -> int:
     args = build_parser().parse_args(argv)
-    stdout = sys.stdout if stdout is None else stdout
-    stderr = sys.stderr if stderr is None else stderr
+    stdout_handle = sys.stdout if stdout is None else stdout
+    stderr_handle = sys.stderr if stderr is None else stderr
 
     try:
         overrides = parse_overrides(args.override)
@@ -296,7 +296,7 @@ def main(
             overrides=overrides,
         )
         report = render_report(analyses, args.format, args.include_scores)
-        write_output(report, args.output, stdout)
+        write_output(report, args.output, stdout_handle)
 
         if not args.transform:
             return 0
@@ -313,10 +313,10 @@ def main(
         )
         if args.transform_output is not None:
             write_transform_output(args.transform_output, transform_result)
-        write_transform_summary(transform_result, stderr)
+        write_transform_summary(transform_result, stderr_handle)
         return 0
     except ValueError as exc:
-        stderr.write(f"Error: {exc}\n")
+        stderr_handle.write(f"Error: {exc}\n")
         return 1
 
 

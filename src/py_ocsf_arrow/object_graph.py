@@ -16,23 +16,48 @@ from typing import Protocol
 class AttributeLike(Protocol):
     """Protocol for schema attributes used by the graph analysis helpers."""
 
-    type: str | None
-    object_type: str | None
+    @property
+    def type(self) -> str | None:
+        """Return the declared OCSF type name for the attribute."""
+        ...
+
+    @property
+    def object_type(self) -> str | None:
+        """Return the referenced OCSF object name for object attributes."""
+        ...
 
 
 class WithAttributesLike(Protocol):
     """Protocol for schema classes and objects that expose attributes."""
 
-    name: str
-    caption: str | None
-    attributes: Mapping[str, AttributeLike]
+    @property
+    def name(self) -> str:
+        """Return the schema object or class name."""
+        ...
+
+    @property
+    def caption(self) -> str | None:
+        """Return the optional human-readable label."""
+        ...
+
+    @property
+    def attributes(self) -> Mapping[str, AttributeLike]:
+        """Return the attribute mapping for the schema container."""
+        ...
 
 
 class SchemaLike(Protocol):
     """Protocol for schema views accepted by the graph helpers."""
 
-    classes: Mapping[str, WithAttributesLike]
-    objects: Mapping[str, WithAttributesLike]
+    @property
+    def classes(self) -> Mapping[str, WithAttributesLike]:
+        """Return the schema's event classes by name."""
+        ...
+
+    @property
+    def objects(self) -> Mapping[str, WithAttributesLike]:
+        """Return the schema's reusable objects by name."""
+        ...
 
 
 @dataclass(slots=True)
