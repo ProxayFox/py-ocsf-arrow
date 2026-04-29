@@ -199,7 +199,9 @@ uv run scripts/analyze_promotions.py \
 ```
 
 The analysis is opt-in and does **not** change the repository's default base-only
-schema generation or loading behavior.
+schema generation or loading behavior. For the full flag reference, report and
+artifact behavior, and transform-output layout, see
+[`docs/schema-generation.md`](docs/schema-generation.md#promotion-analysis-workflow).
 
 ### With Nix
 

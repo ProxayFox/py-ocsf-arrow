@@ -126,6 +126,12 @@ It can be used to:
 - optionally run the opt-in transformation step that rewrites promoted embedded
   objects into foreign-key fields
 
+The workflow is intentionally opt-in. Running the analysis or transform CLI does
+**not** change the repository's default base-only schema generation or loading
+behavior.
+
+### Analysis-only usage
+
 Example usage:
 
 ```bash
@@ -135,6 +141,29 @@ uv run scripts/analyze_promotions.py \
   --override metadata=EMBED \
   --override endpoint=EMBED
 ```
+
+This writes the report to `stdout`. The default `--format summary` output is a
+human-readable verdict summary; use `--include-scores` to append a per-object
+breakdown of the composite and per-axis scores.
+
+### Export machine-readable reports
+
+Use `--format json` or `--format csv` when the results need to feed downstream
+review, automation, or ad hoc spreadsheet work.
+
+```bash
+uv run scripts/analyze_promotions.py \
+  --version 1.8.0 \
+  --format json \
+  --output outputs/promotion-analysis-1.8.0.json \
+  --override metadata=EMBED \
+  --override endpoint=EMBED
+```
+
+`--output` writes the rendered report to a file instead of `stdout` and creates
+parent directories as needed.
+
+### Run the transform pipeline
 
 To write transformed schemas as serialized Arrow schema files:
 
@@ -147,7 +176,61 @@ uv run scripts/analyze_promotions.py \
   --override endpoint=EMBED
 ```
 
+When `--transform` is enabled, the report still goes to `stdout`, while an
+operator-facing transform summary is written to `stderr`. If
+`--transform-output` is set, the CLI writes Arrow-serialized schema artifacts to
+the target directory using this layout:
+
+```text
+outputs/promotion-transform/
+  classes/
+    <class-name>.arrow
+    ...
+  promoted/
+    <object-name>.arrow
+    ...
+  manifest.json
+```
+
+The generated `manifest.json` records the number of transformed class schemas,
+the number of promoted standalone schemas, and any warnings emitted by the
+transform step.
+
+### Flag reference
+
+| Flag | Purpose |
+| --- | --- |
+| `--version` | Required OCSF version to analyze, for example `1.8.0` or `default`. |
+| `--override NAME=VERDICT` | Force a verdict for a specific object. Repeat the flag to supply multiple overrides. |
+| `--promote-threshold` | Override the composite-score threshold used to assign `PROMOTE`. |
+| `--review-threshold` | Override the composite-score threshold used to assign `REVIEW`. |
+| `--format` | Render the analysis as `summary`, `json`, or `csv`. |
+| `--output` | Write the rendered report to a file instead of `stdout`. |
+| `--include-scores` | In `summary` mode, append a per-object score breakdown. |
+| `--transform` | Run the promotion-aware schema transformation pipeline after analysis. |
+| `--strict-review` | In transform mode, treat any remaining `REVIEW` verdict as a failure instead of leaving the object embedded. |
+| `--transform-output` | Directory where transformed `.arrow` schema files and `manifest.json` should be written. |
+
+### Overrides and verdict handling
+
 Overrides are operator-supplied and follow `NAME=VERDICT`, for example
-`metadata=EMBED`. REVIEW verdicts are non-strict by default; use
-`--strict-review` if REVIEW objects should fail the transform step instead of
-remaining embedded.
+`metadata=EMBED`. Verdict names are case-insensitive on input and are validated
+against the script's supported verdict set.
+
+In non-strict mode, objects that remain `REVIEW` stay embedded in the rewritten
+class schemas. This lets operators generate transformed outputs while keeping
+borderline cases explicit and reviewable.
+
+### What the outputs mean
+
+- `summary` is best for interactive review in a terminal.
+- `json` is best for downstream tooling or richer inspection.
+- `csv` is convenient for spreadsheet-style analysis.
+- `classes/*.arrow` contains the transformed class schemas.
+- `promoted/*.arrow` contains standalone schemas for promoted objects.
+- `manifest.json` captures counts and warnings from the transform run.
+
+Use the analysis-only mode when you want to inspect likely promotion candidates
+without generating any new schema artifacts. Use transform mode when you want to
+materialize the foreign-key rewrite and promoted object schemas for further
+experimentation.
